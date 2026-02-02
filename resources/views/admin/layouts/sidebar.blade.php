@@ -81,7 +81,7 @@
                         <li class="px-3 py-2 text-xs uppercase font-medium text-default-500">Pages</li>
 
                         <li class="menu-item">
-                            <a href="{{ route('admin.starter-page') }}"
+                            <a href="{{ url('#') }}"
                                 class="group flex items-center gap-x-3.5 rounded-md px-3 py-2 text-sm font-medium text-default-600 transition-all hover:bg-primary/5">
                                 <i class="i-uil-clipboard size-5"></i>
                                 <span class="menu-text"> Starter Pages </span>
@@ -241,49 +241,49 @@
                             <div class="hs-accordion-content hidden w-full overflow-hidden transition-[height] duration-300">
                                 <ul class="mt-1 space-y-1">
                                     <li class="menu-item">
-                                        <a href="{{ route('admin.forms-inputs') }}"
+                                        <a href="{{ url('#') }}"
                                             class="flex items-center gap-x-3.5 rounded-md px-3 py-1.5 text-sm font-medium text-default-600 transition-all hover:bg-primary/5">
                                             <i class="menu-dot"></i>
                                             <span class="menu-text">Inputs</span>
                                         </a>
                                     </li>
                                     <li class="menu-item">
-                                        <a href="{{ route('admin.forms-check-radio') }}"
+                                        <a href="{{ url('#') }}"
                                             class="flex items-center gap-x-3.5 rounded-md px-3 py-1.5 text-sm font-medium text-default-600 transition-all hover:bg-primary/5">
                                             <i class="menu-dot"></i>
                                             <span class="menu-text">Checkbox & Radio</span>
                                         </a>
                                     </li>
                                     <li class="menu-item">
-                                        <a href="{{ route('admin.forms-masks') }}"
+                                        <a href="{{ url('#') }}"
                                             class="flex items-center gap-x-3.5 rounded-md px-3 py-1.5 text-sm font-medium text-default-600 transition-all hover:bg-primary/5">
                                             <i class="menu-dot"></i>
                                             <span class="menu-text">Input Masks</span>
                                         </a>
                                     </li>
                                     <li class="menu-item">
-                                        <a href="{{ route('admin.forms-file-upload') }}"
+                                        <a href="{{ url('#') }}"
                                             class="flex items-center gap-x-3.5 rounded-md px-3 py-1.5 text-sm font-medium text-default-600 transition-all hover:bg-primary/5">
                                             <i class="menu-dot"></i>
                                             <span class="menu-text">File Upload</span>
                                         </a>
                                     </li>
                                     <li class="menu-item">
-                                        <a href="{{ route('admin.forms-editor') }}"
+                                        <a href="{{ url('#') }}"
                                             class="flex items-center gap-x-3.5 rounded-md px-3 py-1.5 text-sm font-medium text-default-600 transition-all hover:bg-primary/5">
                                             <i class="menu-dot"></i>
                                             <span class="menu-text">Editor</span>
                                         </a>
                                     </li>
                                     <li class="menu-item">
-                                        <a href="{{ route('admin.forms-validation') }}"
+                                        <a href="{{ url('#') }}"
                                             class="flex items-center gap-x-3.5 rounded-md px-3 py-1.5 text-sm font-medium text-default-600 transition-all hover:bg-primary/5">
                                             <i class="menu-dot"></i>
                                             <span class="menu-text">Validation</span>
                                         </a>
                                     </li>
                                     <li class="menu-item">
-                                        <a href="{{ route('admin.forms-layout') }}"
+                                        <a href="{{ url('#') }}"
                                             class="flex items-center gap-x-3.5 rounded-md px-3 py-1.5 text-sm font-medium text-default-600 transition-all hover:bg-primary/5">
                                             <i class="menu-dot"></i>
                                             <span class="menu-text">Form Layout</span>
@@ -294,7 +294,7 @@
                         </li>
 
                         <li class="menu-item">
-                            <a href="{{ route('admin.maps-vector') }}"
+                            <a href="{{ url('#') }}"
                                 class="group flex items-center gap-x-3.5 rounded-md px-3 py-2 text-sm font-medium text-default-600 transition-all hover:bg-primary/5">
                                 <i class="i-uil-map-pin size-5"></i>
                                 <span class="menu-text"> Maps </span>
@@ -302,7 +302,7 @@
                         </li>
 
                         <li class="menu-item">
-                            <a href="{{ route('admin.tables-basic') }}"
+                            <a href="{{ url('#') }}"
                                 class="group flex items-center gap-x-3.5 rounded-md px-3 py-2 text-sm font-medium text-default-600 transition-all hover:bg-primary/5 hs-accordion-active:bg-primary/5 hs-accordion-active:text-primary">
                                 <i class="i-uil-table size-5"></i>
                                 <span class="menu-text"> Tables </span>
@@ -310,7 +310,7 @@
                         </li>
 
                         <li class="menu-item">
-                            <a href="{{ route('admin.charts-apex') }}"
+                            <a href="{{ url('#') }}"
                                 class="group flex items-center gap-x-3.5 rounded-md px-3 py-2 text-sm font-medium text-default-600 transition-all hover:bg-primary/5 hs-accordion-active:bg-primary/5 hs-accordion-active:text-primary">
                                 <i class="i-tabler-chart-donut-2 size-5"></i>
                                 <span class="menu-text"> Chart </span>
@@ -318,7 +318,7 @@
                         </li>
 
                         <li class="menu-item">
-                            <a href="{{ route('admin.icons') }}"
+                            <a href="{{ url('#') }}"
                                 class="group flex items-center gap-x-3.5 rounded-md px-3 py-2 text-sm font-medium text-default-600 transition-all hover:bg-primary/5">
                                 <i class="i-uil-palette size-5"></i>
                                 <span class="menu-text"> Icons </span>
