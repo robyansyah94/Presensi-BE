@@ -53,7 +53,8 @@
 
                 <div
                     class="rounded-full flex justify-center items-center size-14 bg-secondary/10 text-secondary">
-                    <i class="material-symbols-rounded text-2xl transition-all group-hover:fill-1">login</i>
+                    <i
+                        class="material-symbols-rounded text-2xl transition-all group-hover:fill-1" style="color:green">login</i>
                 </div>
             </div>
         </div>
@@ -72,7 +73,7 @@
 
                 <div
                     class="rounded-full flex justify-center items-center size-14 bg-secondary/10 text-secondary">
-                    <i class="material-symbols-rounded text-2xl transition-all group-hover:fill-1">logout</i>
+                    <i class="material-symbols-rounded text-2xl transition-all group-hover:fill-1" style="color:red">logout</i>
                 </div>
             </div>
         </div>
