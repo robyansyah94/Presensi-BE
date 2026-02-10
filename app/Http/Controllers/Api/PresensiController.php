@@ -4,10 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Karyawan;
-use App\Models\JadwalShift;
-use App\Models\Presensi;
-use App\Models\QrPresensi;
 
 class PresensiController extends Controller
 {
@@ -30,12 +26,15 @@ class PresensiController extends Controller
             ], 400);
         }
 
-        // 2. AMBIL KARYAWAN DUMMY (TESTING)
-        $karyawan = \App\Models\Karyawan::first();
+        // 2. Ambil user yang sedang login
+        $user = $request->user();
+
+        // Ambil data karyawan berdasarkan user_id
+        $karyawan = \App\Models\Karyawan::where('user_id', $user->id)->first();
 
         if (!$karyawan) {
             return response()->json([
-                'message' => 'Data karyawan belum ada di database'
+                'message' => 'Karyawan tidak terdaftar'
             ], 404);
         }
 
