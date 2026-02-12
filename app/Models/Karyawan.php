@@ -12,7 +12,7 @@ class Karyawan extends Model
         'users_id',
         'jabatan_id',
         'nip',
-        'nama',
+        'name',
         'no_hp',
         'alamat',
         'foto',
@@ -26,7 +26,7 @@ class Karyawan extends Model
 
     public function jabatan()
     {
-        return $this->belongsTo(Jabatan::class);
+        return $this->belongsTo(Jabatan::class, 'jabatan_id');
     }
 
     public function presensi()

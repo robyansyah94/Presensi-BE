@@ -40,6 +40,12 @@ class AdminAuthController extends Controller
     public function dashboard()
     {
         return view('admin.dashboard');
+
+    }
+    
+    public function karyawan()
+    {
+        return view('admin.karyawan.karyawan');
     }
 
     public function logout()

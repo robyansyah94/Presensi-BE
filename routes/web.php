@@ -1,20 +1,28 @@
 <?php
 
-use App\Http\Controllers\Admin\QrPresensiController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AdminAuthController;
+use App\Http\Controllers\Admin\QrPresensiController;
+use App\Http\Controllers\Admin\KaryawanController;
+
 
 Route::get('/', function () {
-    return redirect('/admin/login');
+    return redirect()->route('admin.login');
 });
 
-Route::get('/admin/qr-presensi', [QrPresensiController::class, 'index']);
-Route::get('/admin/generate-qr', [QrPresensiController::class, 'generate']);
 
-Route::get('/admin/login', [AdminAuthController::class, 'showLogin'])->name('login');
-Route::post('/admin/login', [AdminAuthController::class, 'login']);
+Route::prefix('admin')->group(function () {
+    Route::get('/login', [AdminAuthController::class, 'showLogin'])->name('admin.login');
+    Route::post('/login', [AdminAuthController::class, 'login']);
+});
 
-Route::middleware('auth')->group(function () {
-    Route::get('/admin/dashboard', [AdminAuthController::class, 'dashboard'])->name('admin.dashboard');
-    Route::post('/admin/logout', [AdminAuthController::class, 'logout']);
+
+Route::prefix('admin')->middleware('auth')->group(function () {
+    Route::get('/dashboard', [AdminAuthController::class, 'dashboard'])->name('admin.dashboard');
+    Route::post('/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
+    // QR Presensi
+    Route::get('/qr-presensi', [QrPresensiController::class, 'index'])->name('admin.qr.index');
+    Route::get('/generate-qr', [QrPresensiController::class, 'generate'])->name('admin.qr.generate');
+    // Karyawan
+    Route::resource('/karyawan', KaryawanController::class);
 });

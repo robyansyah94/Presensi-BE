@@ -40,7 +40,7 @@
 
                 <li class="menu-item">
                     <a class="group flex items-center gap-x-3.5 rounded-md px-3 py-2 text-sm font-medium text-default-600 transition-all hover:bg-primary/5"
-                        href="app-calendar.html">
+                        href="{{ url('/admin/karyawan') }}">
                         <i class="material-symbols-rounded" style="font-size: 21px;">
                             groups
                         </i>
@@ -48,7 +48,7 @@
                     </a>
                 </li>
 
-                <li class="menu-item">
+                <!-- <li class="menu-item">
                     <a class="group flex items-center gap-x-3.5 rounded-md px-3 py-2 text-sm font-medium text-default-600 transition-all hover:bg-primary/5"
                         href="app-calendar.html">
                         <i class="i-uil-calendar size-5"></i>
@@ -372,7 +372,7 @@
                         <span
                             class="ms-auto inline-flex items-center gap-x-1.5 py-0.5 px-2 rounded-full font-bold text-xs bg-red-500 text-white">Hot</span>
                     </a>
-                </li>
+                </li> -->
             </ul>
         </div>
     </div>

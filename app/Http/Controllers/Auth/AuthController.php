@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Auth;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -14,13 +16,13 @@ class AuthController extends Controller
         ]);
 
         // Cek login
-        if (!auth()->attempt($request->only('email', 'password'))) {
+        if (!Auth::attempt($request->only('email', 'password'))) {
             return response()->json([
                 'message' => 'Email atau password salah'
             ], 401);
         }
 
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Hanya karyawan boleh login ke Vue
         if ($user->role !== 'karyawan') {
