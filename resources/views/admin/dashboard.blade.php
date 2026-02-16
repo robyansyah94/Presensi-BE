@@ -29,7 +29,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-xs tracking-wide font-semibold uppercase text-default-700 mb-3">KARYAWAN</p>
-                    <h4 class="font-semibold text-2xl text-default-700">120</h4>
+                    <h4 class="font-semibold text-2xl text-default-700">{{ $totalKaryawan }}</h4>
                 </div>
 
                 <div
@@ -125,4 +125,5 @@
 @push('scripts')
 <script src="{{ asset('admin/libs/apexcharts/apexcharts.min.js') }}"></script>
 <script src="{{ asset('admin/js/pages/dashboard.js') }}"></script>
+
 @endpush

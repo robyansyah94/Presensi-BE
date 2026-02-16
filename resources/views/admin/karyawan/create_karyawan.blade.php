@@ -51,7 +51,7 @@
                         class="form-input"
                         placeholder="Masukkan NIP">
                 </div>
-                
+
                 <!-- No HP -->
                 <div>
                     <label for="no_hp"
@@ -64,7 +64,19 @@
                         class="form-input"
                         placeholder="Masukkan No HP">
                 </div>
-                
+
+                <!-- Alamat -->
+                <div>
+                    <label for="alamat"
+                        class="text-default-800 text-sm font-medium inline-block mb-2">
+                        Alamat
+                    </label>
+                    <input type="text"
+                        id="alamat"
+                        name="alamat"
+                        class="form-input"
+                        placeholder="Masukkan Alamat">
+                </div>
 
                 <!-- Jabatan -->
                 <div>
@@ -75,6 +87,7 @@
                     <select name="jabatan_id"
                         id="jabatan_id"
                         class="form-select">
+                        <option value="">-- Pilih Jabatan --</option>
                         @foreach($jabatan as $j)
                         <option value="{{ $j->id }}">
                             {{ $j->nama_jabatan }}
@@ -83,7 +96,7 @@
                     </select>
                 </div>
 
-                <!-- Foto -->
+                <!-- Foto 1 -->
                 <div class="lg:col-span-2">
                     <label for="foto"
                         class="text-default-800 text-sm font-medium inline-block mb-2">

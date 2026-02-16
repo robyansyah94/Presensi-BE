@@ -4,6 +4,30 @@
 
 @section('content')
 
+@if(session('success'))
+<div class="bg-success/25 text-success text-sm rounded-md p-4 mb-4" role="alert">
+    <span class="font-bold">Success!</span>
+    {{ session('success') }}
+</div>
+@endif
+
+@if(session('error'))
+<div class="bg-danger/25 text-danger text-sm rounded-md p-4 mb-4" role="alert">
+    <span class="font-bold">Danger!</span>
+    {{ session('error') }}
+</div>
+@endif
+
+<script>
+    setTimeout(function () {
+        let alerts = document.querySelectorAll('[role="alert"]');
+        alerts.forEach(function(alert) {
+            alert.style.display = 'none';
+        });
+    }, 3000); // 3000 = 3 detik
+</script>
+
+
 <!-- Page Title -->
 <div class="flex items-center justify-between flex-wrap gap-2 mb-5">
     <h4 class="text-default-900 text-lg font-semibold">DATA KARYAWAN</h4>
@@ -13,6 +37,7 @@
         + Tambah Karyawan
     </a>
 </div>
+
 
 <div class="card">
     <div class="overflow-x-auto">
@@ -54,12 +79,12 @@
                                 Detail
                             </a>
 
-                            <a href="#"
+                            <a href="{{ route('karyawan.edit', $k->id) }}"
                                 class="btn rounded-full border border-warning text-warning hover:bg-warning hover:text-white">
                                 Edit
                             </a>
 
-                            <form action="#" method="POST"
+                            <form action="{{ route('karyawan.destroy', $k->id) }}" method="POST"
                                 onsubmit="return confirm('Yakin hapus data?')">
                                 @csrf
                                 @method('DELETE')

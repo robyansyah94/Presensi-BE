@@ -25,4 +25,7 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::get('/generate-qr', [QrPresensiController::class, 'generate'])->name('admin.qr.generate');
     // Karyawan
     Route::resource('/karyawan', KaryawanController::class);
+    Route::get('/karyawan/{id}/edit', [KaryawanController::class, 'edit'])->name('karyawan.edit');
+    Route::put('/karyawan/{id}', [KaryawanController::class, 'update'])->name('karyawan.update');
+    Route::delete('/karyawan/{id}', [KaryawanController::class, 'destroy'])->name('karyawan.destroy');
 });

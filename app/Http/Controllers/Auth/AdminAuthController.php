@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Karyawan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -39,10 +40,11 @@ class AdminAuthController extends Controller
 
     public function dashboard()
     {
-        return view('admin.dashboard');
+        $totalKaryawan = Karyawan::count();
 
+        return view('admin.dashboard', compact('totalKaryawan') );
     }
-    
+
     public function karyawan()
     {
         return view('admin.karyawan.karyawan');
