@@ -30,12 +30,34 @@
 
 <!-- Page Title -->
 <div class="flex items-center justify-between flex-wrap gap-2 mb-5">
-    <h4 class="text-default-900 text-lg font-semibold">DATA KARYAWAN</h4>
+    <h4 class="text-default-900 text-lg font-semibold">DATA USER</h4>
 
-    <a href="{{ route('karyawan.create') }}"
+    <a href="{{ route('users.create') }}"
         class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-        + Tambah Karyawan
+        + Tambah User
     </a>
+</div>
+
+<div class="flex gap-2 mb-4">
+
+    <a href="{{ route('users.index') }}"
+        class="px-4 py-2 rounded 
+       {{ request('role') == null ? 'bg-blue-600 text-white' : 'bg-gray-200' }}">
+        Semua
+    </a>
+
+    <a href="{{ route('users.index', ['role' => 'karyawan']) }}"
+        class="px-4 py-2 rounded 
+       {{ request('role') == 'karyawan' ? 'bg-blue-600 text-white' : 'bg-gray-200' }}">
+        Karyawan
+    </a>
+
+    <a href="{{ route('users.index', ['role' => 'admin']) }}"
+        class="px-4 py-2 rounded 
+       {{ request('role') == 'admin' ? 'bg-blue-600 text-white' : 'bg-gray-200' }}">
+        Admin
+    </a>
+
 </div>
 
 
@@ -55,53 +77,86 @@
             </thead>
 
             <tbody class="divide-y">
-                @foreach($karyawan as $i => $k)
+                @foreach($users as $i => $user)
                 <tr class="hover:bg-gray-50">
                     <td class="px-6 py-3">{{ $i + 1 }}</td>
+
+                    <!-- NAMA + FOTO -->
                     <td class="px-4 py-3 flex items-center gap-3">
-                        <img src="{{ $k->foto ? asset('storage/'.$k->foto) : asset('admin/images/users/avatar-1.jpg') }}"
+                        <img
+                            src="{{ $user->karyawan && $user->karyawan->foto 
+                ? asset('storage/'.$user->karyawan->foto) 
+                : asset('admin/images/users/avatar-1.jpg') }}"
                             class="w-10 h-10 rounded-full object-cover">
+
                         <span class="font-semibold text-gray-800">
-                            {{ $k->user->name }}
+                            {{ $user->name }}
                         </span>
                     </td>
-                    <td class="px-4 py-3">{{ $k->nip }}</td>
-                    <td class="px-4 py-3">{{ $k->user->email }}</td>
-                    <td class="px-4 py-3">{{ $k->jabatan->nama_jabatan }}</td>
-                    <td class="px-4 py-3">{{ $k->user->role }}</td>
+
+                    <!-- NIP -->
+                    <td class="px-4 py-3">
+                        {{ $user->karyawan?->nip ?? '-' }}
+                    </td>
+
+                    <!-- EMAIL -->
+                    <td class="px-4 py-3">
+                        {{ $user->email }}
+                    </td>
+
+                    <!-- JABATAN -->
+                    <td class="px-4 py-3">
+                        {{ $user->karyawan?->jabatan?->nama_jabatan ?? '-' }}
+                    </td>
+
+                    <!-- ROLE -->
+                    <td class="px-4 py-3 capitalize">
+                        {{ $user->role }}
+                    </td>
 
                     <!-- AKSI -->
                     <td class="px-4 py-3">
                         <div class="flex items-center justify-center gap-2">
 
+                            <!-- DETAIL -->
                             <button type="button"
                                 class="btn-detail btn rounded-full border border-info text-info hover:bg-info hover:text-white"
-                                data-nama="{{ $k->user->name }}"
-                                data-email="{{ $k->user->email }}"
-                                data-nip="{{ $k->nip }}"
-                                data-nohp="{{ $k->no_hp }}"
-                                data-alamat="{{ $k->alamat }}"
-                                data-jabatan="{{ $k->jabatan->nama_jabatan }}"
-                                data-foto="{{ $k->foto ? asset('storage/'.$k->foto) : asset('admin/images/users/avatar-1.jpg') }}">
+                                data-nama="{{ $user->name }}"
+                                data-email="{{ $user->email }}"
+                                data-nip="{{ $user->karyawan?->nip }}"
+                                data-nohp="{{ $user->karyawan?->no_hp }}"
+                                data-alamat="{{ $user->karyawan?->alamat }}"
+                                data-jabatan="{{ $user->karyawan?->jabatan?->nama_jabatan }}"
+                                data-role="{{ $user->role }}"
+                                data-foto="{{ $user->karyawan && $user->karyawan->foto 
+                    ? asset('storage/'.$user->karyawan->foto) 
+                    : asset('admin/images/users/avatar-1.jpg') }}">
                                 Detail
                             </button>
 
-
-                            <a href="{{ route('karyawan.edit', $k->id) }}"
+                            <!-- EDIT -->
+                            @if($user->karyawan)
+                            <a href="{{ route('users.edit', $user->karyawan->id) }}"
                                 class="btn rounded-full border border-warning text-warning hover:bg-warning hover:text-white">
                                 Edit
                             </a>
+                            @endif
 
-                            <form action="{{ route('karyawan.destroy', $k->id) }}" method="POST"
-                                onsubmit="return confirm('Yakin hapus data?')">
+                            <!-- HAPUS -->
+                            @if($user->karyawan)
+                            <form action="{{ route('users.destroy', $user->karyawan->id) }}"
+                                method="POST"
+                                id="delete-form-{{ $user->karyawan->id }}">
                                 @csrf
                                 @method('DELETE')
-
-                                <button
+                                <button type="button"
+                                    onclick="confirmDelete('{{ $user->karyawan->id }}')"
                                     class="btn rounded-full border border-danger text-danger hover:bg-danger hover:text-white">
                                     Hapus
                                 </button>
                             </form>
+                            @endif
+
                         </div>
                     </td>
                 </tr>
@@ -118,6 +173,28 @@
 <!-- SweetAlert -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+<!-- hapus -->
+<script>
+    function confirmDelete(id) {
+        Swal.fire({
+            title: "Apakah Anda yakin?",
+            text: "Data karyawan ini akan dihapus permanen!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Ya, hapus!",
+            cancelButtonText: "Batal"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Cari form berdasarkan ID dan submit
+                document.getElementById('delete-form-' + id).submit();
+            }
+        });
+    }
+</script>
+
+<!-- detail karyawan -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.btn-detail').forEach(button => {
@@ -149,6 +226,7 @@
                             ${detailItem('Email', d.email)}
                             ${detailItem('No HP', d.nohp)}
                             ${detailItem('Alamat', d.alamat)}
+                            ${detailItem('Role', d.role)}
                         </div>
                     </div>
                     `

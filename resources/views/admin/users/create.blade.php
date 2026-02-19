@@ -8,7 +8,7 @@
     </div>
 
     <div class="p-6">
-        <form action="{{ route('karyawan.store') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('users.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
             <div class="grid lg:grid-cols-2 gap-6">
@@ -26,6 +26,19 @@
                         placeholder="Masukkan Nama">
                 </div>
 
+                <!-- NIP -->
+                <div>
+                    <label for="nip"
+                        class="text-default-800 text-sm font-medium inline-block mb-2">
+                        NIP
+                    </label>
+                    <input type="text"
+                        id="nip"
+                        name="nip"
+                        class="form-input"
+                        placeholder="Masukkan NIP">
+                </div>
+
                 <!-- Email -->
                 <div>
                     <label for="email"
@@ -39,17 +52,17 @@
                         placeholder="Masukkan Email">
                 </div>
 
-                <!-- NIP -->
+                <!-- Password -->
                 <div>
-                    <label for="nip"
+                    <label for="password"
                         class="text-default-800 text-sm font-medium inline-block mb-2">
-                        NIP
+                        Password
                     </label>
-                    <input type="text"
-                        id="nip"
-                        name="nip"
+                    <input type="password"
+                        id="password"
+                        name="password"
                         class="form-input"
-                        placeholder="Masukkan NIP">
+                        placeholder="Masukkan Password">
                 </div>
 
                 <!-- No HP -->
