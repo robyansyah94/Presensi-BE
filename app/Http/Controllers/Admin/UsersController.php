@@ -38,48 +38,46 @@ class UsersController extends Controller
     {
         $request->validate([
             'name'       => 'required|string|max:255',
+            'nip'        => 'required|string|max:50',
             'email'      => 'required|email|unique:users,email',
-            'password'   => 'required|min:6',
+            'password'   => 'required|min:5',
             'role'       => 'required|in:admin,karyawan',
-            'nip'        => 'nullable|string|max:50',
-            'jabatan_id' => 'nullable|exists:jabatan,id',
-            'no_hp'      => 'nullable|string|max:15',
-            'alamat'     => 'nullable|string',
-            'foto'       => 'nullable|image|max:2048',
-            'status'     => 'nullable|in:aktif,nonaktif',
+            'jabatan_id' => 'required|exists:jabatan,id',
+            'no_hp'      => 'required|string|max:15',
+            'alamat'     => 'required|string',
+            'foto'       => 'required|image|max:2048',
+            'status'     => 'required|in:aktif,nonaktif',
         ]);
 
         DB::transaction(function () use ($request) {
 
-            // 1️⃣ Buat user dulu
+            // 1️⃣ Buat user (password auto hashed dari model)
             $user = User::create([
                 'name'     => $request->name,
                 'email'    => $request->email,
-                'password' => bcrypt($request->password),
+                'password' => $request->password,
                 'role'     => $request->role,
             ]);
 
-            // 2️⃣ Kalau role karyawan baru buat detail karyawan
-            if ($request->role === 'karyawan') {
+            // 2️⃣ Upload foto jika ada
+            $fotoPath = null;
 
-                $fotoPath = null;
-
-                if ($request->hasFile('foto')) {
-                    $fotoPath = $request->file('foto')->store('karyawan', 'public');
-                }
-
-                Karyawan::create([
-                    'users_id'   => $user->id,
-                    'jabatan_id' => $request->jabatan_id,
-                    'nip'        => $request->nip,
-                    'no_hp'      => $request->no_hp,
-                    'alamat'     => $request->alamat,
-                    'foto'       => $fotoPath,
-                    'status'     => $request->status ?? 'aktif',
-                ]);
+            if ($request->hasFile('foto')) {
+                $fotoPath = $request->file('foto')->store('karyawan', 'public');
             }
+
+            // 3️⃣ Buat data karyawan via relasi (lebih clean)
+            $user->karyawan()->create([
+                'jabatan_id' => $request->jabatan_id,
+                'nip'        => $request->nip,
+                'no_hp'      => $request->no_hp,
+                'alamat'     => $request->alamat,
+                'foto'       => $fotoPath,
+                'status'     => $request->status,
+            ]);
         });
-        return redirect()->route('users.index')
+        return redirect()
+            ->route('users.index')
             ->with('success', 'User berhasil ditambahkan.');
     }
 
@@ -104,41 +102,31 @@ class UsersController extends Controller
             'foto' => 'nullable|image|mimes:jpg,png,jpeg'
         ]);
 
-        DB::transaction(function () use ($request, $user) {
+        DB::transaction(function () use ($request) {
 
-            // 1️⃣ Update user
-            $user->update([
-                'name' => $request->name,
-                'email' => $request->email,
+            $user = User::create([
+                'name'     => $request->name,
+                'email'    => $request->email,
+                'password' => $request->password, // sudah auto-hashed di model
+                'role'     => $request->role,
             ]);
 
-            // 2️⃣ Kalau dia punya karyawan
-            if ($user->karyawan) {
+            $fotoPath = null;
 
-                $karyawan = $user->karyawan;
-
-                $fotoPath = $karyawan->foto;
-
-                if ($request->hasFile('foto')) {
-
-                    // hapus foto lama
-                    if ($fotoPath && Storage::disk('public')->exists($fotoPath)) {
-                        Storage::disk('public')->delete($fotoPath);
-                    }
-
-                    $fotoPath = $request->file('foto')->store('karyawan', 'public');
-                }
-
-                $karyawan->update([
-                    'jabatan_id' => $request->jabatan_id,
-                    'nip' => $request->nip,
-                    'no_hp' => $request->no_hp,
-                    'alamat' => $request->alamat,
-                    'foto' => $fotoPath
-                ]);
+            if ($request->hasFile('foto')) {
+                $fotoPath = $request->file('foto')->store('karyawan', 'public');
             }
-        });
 
+            Karyawan::create([
+                'users_id'   => $user->id,
+                'jabatan_id' => $request->jabatan_id,
+                'nip'        => $request->nip,
+                'no_hp'      => $request->no_hp,
+                'alamat'     => $request->alamat,
+                'foto'       => $fotoPath,
+                'status'     => $request->status ?? 'aktif',
+            ]);
+        });
         return redirect()
             ->route('users.index')
             ->with('success', 'User berhasil diupdate');

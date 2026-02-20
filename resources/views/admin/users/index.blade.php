@@ -24,7 +24,7 @@
         alerts.forEach(function(alert) {
             alert.style.display = 'none';
         });
-    }, 1500); //detik
+    }, 2000); //detik
 </script>
 
 
