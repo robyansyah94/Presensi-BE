@@ -12,7 +12,7 @@
     </div>
 
     <div class="p-6">
-        <form action="{{ route('karyawan.update', $karyawan->id) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('users.update', $user->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -25,7 +25,7 @@
                     </label>
                     <input type="text"
                         name="name"
-                        value="{{ $karyawan->user->name }}"
+                        value="{{ $user->name }}"
                         class="form-input"
                         required>
                 </div>
@@ -37,7 +37,7 @@
                     </label>
                     <input type="email"
                         name="email"
-                        value="{{ $karyawan->user->email }}"
+                        value="{{ $user->email }}"
                         class="form-input"
                         required>
                 </div>
@@ -49,7 +49,7 @@
                     </label>
                     <input type="text"
                         name="nip"
-                        value="{{ $karyawan->nip }}"
+                        value="{{ $user->karyawan->nip }}"
                         class="form-input"
                         required>
                 </div>
@@ -61,7 +61,7 @@
                     </label>
                     <input type="text"
                         name="no_hp"
-                        value="{{ $karyawan->no_hp }}"
+                        value="{{ $user->karyawan->no_hp }}"
                         class="form-input"
                         required>
                 </div>
@@ -73,7 +73,7 @@
                     </label>
                     <input type="text"
                         name="alamat"
-                        value="{{ $karyawan->alamat }}"
+                        value="{{ $user->karyawan->alamat }}"
                         class="form-input"
                         required>
                 </div>
@@ -86,7 +86,7 @@
                     <select name="jabatan_id" class="form-select" required>
                         @foreach($jabatan as $j)
                         <option value="{{ $j->id }}"
-                            {{ $karyawan->jabatan_id == $j->id ? 'selected' : '' }}>
+                            {{ $user->karyawan->jabatan_id == $j->id ? 'selected' : '' }}>
                             {{ $j->nama_jabatan }}
                         </option>
                         @endforeach
@@ -99,8 +99,8 @@
                         Foto Saat Ini
                     </label>
                     <div>
-                        @if($karyawan->foto)
-                        <img src="{{ asset('storage/' . $karyawan->foto) }}"
+                        @if($user->karyawan->foto)
+                        <img src="{{ asset('storage/' . $user->karyawan->foto) }}"
                             class="w-24 h-24 object-cover rounded">
                         @else
                         <span class="text-sm text-gray-400">Belum ada foto</span>
@@ -123,9 +123,9 @@
 
             <div class="mt-6">
                 <button type="submit" class="btn bg-primary text-white">
-                    Update Karyawan
+                    Update User
                 </button>
-                <a href="{{ route('karyawan.index') }}" class="btn border ml-2">
+                <a href="{{ route('users.index') }}" class="btn border ml-2">
                     Batal
                 </a>
             </div>

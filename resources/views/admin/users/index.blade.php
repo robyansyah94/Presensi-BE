@@ -39,25 +39,33 @@
 </div>
 
 <div class="flex gap-2 mb-4">
-
+    <!-- Semua -->
     <a href="{{ route('users.index') }}"
-        class="px-4 py-2 rounded 
-       {{ request('role') == null ? 'bg-blue-600 text-white' : 'bg-gray-200' }}">
+        class="btn
+        {{ request('role') == null 
+            ? 'bg-info text-white' 
+            : 'bg-info/25 text-info hover:bg-info hover:text-white' }}">
         Semua
     </a>
 
+    <!-- Karyawan -->
     <a href="{{ route('users.index', ['role' => 'karyawan']) }}"
-        class="px-4 py-2 rounded 
-       {{ request('role') == 'karyawan' ? 'bg-blue-600 text-white' : 'bg-gray-200' }}">
+        class="btn
+        {{ request('role') == 'karyawan' 
+            ? 'bg-success text-white' 
+            : 'bg-success/25 text-success hover:bg-success hover:text-white' }}">
         Karyawan
     </a>
 
+
+    <!-- Admin -->
     <a href="{{ route('users.index', ['role' => 'admin']) }}"
-        class="px-4 py-2 rounded 
-       {{ request('role') == 'admin' ? 'bg-blue-600 text-white' : 'bg-gray-200' }}">
+        class="btn
+        {{ request('role') == 'admin' 
+            ? 'bg-danger text-white' 
+            : 'bg-danger/25 text-danger hover:bg-danger hover:text-white' }}">
         Admin
     </a>
-
 </div>
 
 
@@ -111,7 +119,12 @@
 
                     <!-- ROLE -->
                     <td class="px-4 py-3 capitalize">
-                        {{ $user->role }}
+                        <span class="px-3 py-1 rounded-full
+                            {{ $user->role == 'admin' 
+                                ? ' bg-red-100'
+                                : ' bg-green-100' }}">
+                            {{ ucfirst($user->role) }}
+                        </span>
                     </td>
 
                     <!-- AKSI -->
@@ -136,7 +149,7 @@
 
                             <!-- EDIT -->
                             @if($user->karyawan)
-                            <a href="{{ route('users.edit', $user->karyawan->id) }}"
+                            <a href="{{ route('users.edit', $user->id) }}"
                                 class="btn rounded-full border border-warning text-warning hover:bg-warning hover:text-white">
                                 Edit
                             </a>
@@ -144,13 +157,13 @@
 
                             <!-- HAPUS -->
                             @if($user->karyawan)
-                            <form action="{{ route('users.destroy', $user->karyawan->id) }}"
+                            <form action="{{ route('users.destroy', $user->id) }}"
                                 method="POST"
-                                id="delete-form-{{ $user->karyawan->id }}">
+                                id="delete-form-{{ $user->id }}">
                                 @csrf
                                 @method('DELETE')
                                 <button type="button"
-                                    onclick="confirmDelete('{{ $user->karyawan->id }}')"
+                                    onclick="confirmDelete('{{ $user->id }}')"
                                     class="btn rounded-full border border-danger text-danger hover:bg-danger hover:text-white">
                                     Hapus
                                 </button>

@@ -81,14 +81,13 @@ class UsersController extends Controller
             ->with('success', 'User berhasil ditambahkan.');
     }
 
-    public function edit(User $user)
+    public function edit($id)
     {
+        $user = User::with('karyawan')->findOrFail($id);
         $jabatan = Jabatan::all();
-        $user->load('karyawan');
 
         return view('admin.users.edit', compact('user', 'jabatan'));
     }
-
 
     public function update(Request $request, User $user)
     {
@@ -102,31 +101,32 @@ class UsersController extends Controller
             'foto' => 'nullable|image|mimes:jpg,png,jpeg'
         ]);
 
-        DB::transaction(function () use ($request) {
+        DB::transaction(function () use ($request, $user) {
 
-            $user = User::create([
-                'name'     => $request->name,
-                'email'    => $request->email,
-                'password' => $request->password, // sudah auto-hashed di model
-                'role'     => $request->role,
+            // UPDATE USER
+            $user->update([
+                'name'  => $request->name,
+                'email' => $request->email,
             ]);
 
-            $fotoPath = null;
+            $karyawan = $user->karyawan;
+
+            $fotoPath = $karyawan->foto ?? null;
 
             if ($request->hasFile('foto')) {
                 $fotoPath = $request->file('foto')->store('karyawan', 'public');
             }
 
-            Karyawan::create([
-                'users_id'   => $user->id,
+            // UPDATE KARYAWAN
+            $karyawan->update([
                 'jabatan_id' => $request->jabatan_id,
                 'nip'        => $request->nip,
                 'no_hp'      => $request->no_hp,
                 'alamat'     => $request->alamat,
                 'foto'       => $fotoPath,
-                'status'     => $request->status ?? 'aktif',
             ]);
         });
+
         return redirect()
             ->route('users.index')
             ->with('success', 'User berhasil diupdate');
