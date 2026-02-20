@@ -22,7 +22,7 @@ class JabatanController extends Controller
      */
     public function create()
     {
-        //
+        return view('admin.jabatan.create');
     }
 
     /**
@@ -30,7 +30,18 @@ class JabatanController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'nama_jabatan' => 'required|string|max:255|unique:jabatan,nama_jabatan',
+            'keterangan'   => 'nullable|string'
+        ]);
+
+        \App\Models\Jabatan::create([
+            'nama_jabatan' => $request->nama_jabatan,
+            'keterangan'   => $request->keterangan
+        ]);
+
+        return redirect()->route('jabatan.index')
+            ->with('success', 'Data jabatan berhasil ditambahkan.');
     }
 
     /**
