@@ -1,9 +1,9 @@
 <?php
 
+use App\Http\Controllers\Admin\JabatanController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\Admin\QrPresensiController;
-use App\Http\Controllers\Admin\KaryawanController;
 use App\Http\Controllers\Admin\UsersController;
 
 Route::get('/', function () {
@@ -20,10 +20,14 @@ Route::prefix('admin')->group(function () {
 Route::prefix('admin')->middleware('auth')->group(function () {
     Route::get('/dashboard', [AdminAuthController::class, 'dashboard'])->name('admin.dashboard');
     Route::post('/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
+
     // QR Presensi
     Route::get('/qr-presensi', [QrPresensiController::class, 'index'])->name('admin.qr.index');
     Route::get('/generate-qr', [QrPresensiController::class, 'generate'])->name('admin.qr.generate');
 
     // Users
     Route::resource('/users', UsersController::class);
+
+    // jabatn
+    Route::resource('/jabatan', JabatanController::class);
 });
