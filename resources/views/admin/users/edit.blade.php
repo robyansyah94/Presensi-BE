@@ -7,10 +7,6 @@
 </div>
 
 <div class="card">
-    <div class="card-header">
-        <h4 class="card-title">Form Edit Karyawan</h4>
-    </div>
-
     <div class="p-6">
         <form action="{{ route('users.update', $user->id) }}" method="POST" enctype="multipart/form-data">
             @csrf

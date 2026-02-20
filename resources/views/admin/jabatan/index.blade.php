@@ -43,6 +43,7 @@
                 <tr class="text-sm">
                     <th class="px-4 py-3 text-left">No</th>
                     <th class="px-4 py-3 text-left">Nama Jabatan</th>
+                    <th class="px-4 py-3 text-left">Deskripsi</th>
                     <th class="px-4 py-3 text-center">Aksi</th>
                 </tr>
             </thead>
@@ -55,6 +56,9 @@
                     <td class="px-4 py-3 font-semibold text-gray-800">
                         {{ $jabatan->nama_jabatan }}
                     </td>
+
+                    <td class="px-4 py-3 text-gray-600">
+                        {{ $jabatan->keterangan ?? '-' }}
 
                     <td class="px-4 py-3">
                         <div class="flex items-center justify-center gap-2">

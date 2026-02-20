@@ -46,7 +46,9 @@ class JabatanController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $jabatan = \App\Models\Jabatan::findOrFail($id);
+
+        return view('admin.jabatan.edit', compact('jabatan'));
     }
 
     /**
@@ -54,7 +56,20 @@ class JabatanController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $jabatan = \App\Models\Jabatan::findOrFail($id);
+
+        $request->validate([
+            'nama_jabatan' => 'required|string|max:255|unique:jabatan,nama_jabatan,' . $jabatan->id,
+            'keterangan'   => 'nullable|string'
+        ]);
+
+        $jabatan->update([
+            'nama_jabatan' => $request->nama_jabatan,
+            'keterangan'   => $request->keterangan
+        ]);
+
+        return redirect()->route('jabatan.index')
+            ->with('success', 'Data jabatan berhasil diperbarui.');
     }
 
     /**
@@ -66,7 +81,7 @@ class JabatanController extends Controller
 
         //ulah di hapus jika masih ada karyawan yang menggunakan jabatan ini
         if ($jabatan->karyawan()->count() > 0) {
-            return back()->with('error', 'Jabatan tidak bisa dihapus karena masih digunakan karyawan.');
+            return back()->with('error', ' Jabatan tidak bisa dihapus karena masih digunakan karyawan.');
         }
 
         $jabatan->delete();
