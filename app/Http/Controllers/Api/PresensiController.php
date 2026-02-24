@@ -46,7 +46,7 @@ class PresensiController extends Controller
 
             \App\Models\Presensi::create([
                 'karyawan_id' => $karyawan->id,
-                'shift_id' => 1, // sementara
+                'shift_id' => 2, // sementara
                 'tanggal' => now()->toDateString(),
                 'jam_masuk' => now()->toTimeString(),
                 'status' => 'hadir',
