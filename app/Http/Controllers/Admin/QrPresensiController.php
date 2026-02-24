@@ -20,6 +20,9 @@ class QrPresensiController extends Controller
             $token = Str::random(10);
             $expiredAt = now()->addSeconds(10);
 
+            QrPresensi::where('is_active', true)->update([
+                'is_active' => false
+            ]);
 
             QrPresensi::create([
                 'qr_token' => $token,

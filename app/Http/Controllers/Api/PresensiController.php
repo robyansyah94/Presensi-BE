@@ -26,11 +26,10 @@ class PresensiController extends Controller
             ], 400);
         }
 
-        // 2. Ambil user yang sedang login
+        // 2. Ambil user login
         $user = $request->user();
 
-        // Ambil data karyawan berdasarkan user_id
-        $karyawan = \App\Models\Karyawan::where('user_id', $user->id)->first();
+        $karyawan = \App\Models\Karyawan::where('users_id', $user->id)->first();
 
         if (!$karyawan) {
             return response()->json([
@@ -44,18 +43,24 @@ class PresensiController extends Controller
             ->first();
 
         if (!$presensi) {
+
             \App\Models\Presensi::create([
                 'karyawan_id' => $karyawan->id,
-                'qr_presensi_id' => $qr->id,
+                'shift_id' => 1, // sementara
                 'tanggal' => now()->toDateString(),
                 'jam_masuk' => now()->toTimeString(),
-                'status' => 'hadir'
+                'status' => 'hadir',
+                'qr_token' => $qr->qr_token
             ]);
 
             return response()->json([
                 'message' => 'Presensi Masuk Berhasil'
             ]);
-        } else {
+        }
+
+        // Kalau sudah ada → berarti pulang
+        if (!$presensi->jam_pulang) {
+
             $presensi->update([
                 'jam_pulang' => now()->toTimeString()
             ]);
@@ -64,5 +69,9 @@ class PresensiController extends Controller
                 'message' => 'Presensi Pulang Berhasil'
             ]);
         }
+
+        return response()->json([
+            'message' => 'Anda sudah melakukan presensi masuk & pulang hari ini'
+        ], 400);
     }
 }
