@@ -11,13 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('jadwal_shift', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('karyawan_id')->constrained('karyawan')->cascadeOnDelete();
-            $table->foreignId('shift_id')->constrained('shift')->cascadeOnDelete();
-            $table->date('tanggal');
-            $table->timestamps();
-
+        Schema::table('jadwal_shift', function (Blueprint $table) {
             $table->unique(['karyawan_id', 'tanggal'], 'unique_karyawan_tanggal');
         });
     }
@@ -27,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('jadwal_shift');
+        Schema::table('jadwal_shift', function (Blueprint $table) {
+            //
+        });
     }
 };

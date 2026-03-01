@@ -4,6 +4,8 @@ use App\Http\Controllers\Admin\JabatanController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\Admin\QrPresensiController;
+use App\Http\Controllers\Admin\ShiftController;
+use App\Http\Controllers\Admin\JadwalShiftController;
 use App\Http\Controllers\Admin\UsersController;
 
 Route::get('/', function () {
@@ -30,4 +32,13 @@ Route::prefix('admin')->middleware('auth')->group(function () {
 
     // jabatn
     Route::resource('/jabatan', JabatanController::class);
+
+    // shift
+    Route::resource('/shift', ShiftController::class);
+
+    // jadwal shift
+    Route::prefix('jadwal-shift')->name('jadwal-shift.')->group(function () {
+        Route::get('/', [JadwalShiftController::class, 'index'])->name('index');
+        Route::post('/store', [JadwalShiftController::class, 'store'])->name('store');
+    });
 });
