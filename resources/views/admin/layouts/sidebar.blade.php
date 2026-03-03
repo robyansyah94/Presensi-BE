@@ -36,6 +36,16 @@
                     </a>
                 </li>
 
+                <li class="menu-item">
+                    <a class="group flex items-center gap-x-3.5 rounded-md px-3 py-2 text-sm font-medium text-default-600 transition-all hover:bg-primary/5"
+                        href="{{ route('jadwal-shift.preview') }}">
+                        <i class="material-symbols-rounded" style="font-size: 21px;">
+                            schedule
+                        </i>
+                        Schedule
+                    </a>
+                </li>
+
                 <li class="px-3 py-2 text-xs uppercase font-medium text-default-500">MANAGEMENT</li>
 
                 <li class="menu-item">
@@ -57,7 +67,7 @@
                         Jabatan
                     </a>
                 </li>
-                
+
                 <li class="menu-item">
                     <a class="group flex items-center gap-x-3.5 rounded-md px-3 py-2 text-sm font-medium text-default-600 transition-all hover:bg-primary/5"
                         href="{{ route('shift.index') }}">
@@ -72,9 +82,9 @@
                     <a class="group flex items-center gap-x-3.5 rounded-md px-3 py-2 text-sm font-medium text-default-600 transition-all hover:bg-primary/5"
                         href="{{ route('jadwal-shift.index') }}">
                         <i class="material-symbols-rounded" style="font-size: 21px;">
-                            calendar_clock
+                            calendar_add_on
                         </i>
-                        JadwalShift
+                        Jadwal Shift
                     </a>
                 </li>
 

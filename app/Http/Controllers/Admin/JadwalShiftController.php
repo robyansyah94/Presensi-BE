@@ -19,6 +19,47 @@ class JadwalShiftController extends Controller
         return view('admin.jadwal_shift.index', compact('karyawans', 'shifts'));
     }
 
+    // Menampilkan jadwal shift berdasarkan tanggal mulai yang dipilih
+    public function preview(Request $request)
+    {
+        $karyawans = [];
+        $dates = [];
+
+        if ($request->start_date) {
+
+            $startDate = \Carbon\Carbon::parse($request->start_date);
+
+            if (!$startDate->isMonday()) {
+                return back()->with('error', 'Tanggal harus hari Senin!');
+            }
+
+            $dates = collect(range(0, 4))->map(function ($i) use ($startDate) {
+                return $startDate->copy()->addDays($i);
+            });
+
+            $karyawans = \App\Models\Karyawan::with(['user', 'jadwalShift.shift'])
+                ->get()
+                ->map(function ($karyawan) use ($dates) {
+
+                    $schedule = [];
+
+                    foreach ($dates as $date) {
+                        $jadwal = $karyawan->jadwalShift
+                            ->where('tanggal', $date->format('Y-m-d'))
+                            ->first();
+
+                        $schedule[$date->format('Y-m-d')] = $jadwal;
+                    }
+
+                    $karyawan->weekly_schedule = $schedule;
+
+                    return $karyawan;
+                });
+        }
+
+        return view('admin.jadwal_shift.preview', compact('karyawans', 'dates'));
+    }
+
     public function store(Request $request)
     {
         $request->validate([

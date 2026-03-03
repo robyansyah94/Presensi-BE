@@ -40,5 +40,6 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::prefix('jadwal-shift')->name('jadwal-shift.')->group(function () {
         Route::get('/', [JadwalShiftController::class, 'index'])->name('index');
         Route::post('/store', [JadwalShiftController::class, 'store'])->name('store');
+        Route::get('/preview', [JadwalShiftController::class, 'preview'])->name('preview');
     });
 });
