@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Karyawan extends Model
 {
     protected $table = 'karyawan';
-    
+
     protected $fillable = [
         'users_id',
         'jabatan_id',
@@ -15,8 +15,14 @@ class Karyawan extends Model
         'no_hp',
         'alamat',
         'foto',
+        'create_at',
         'status'
     ];
+
+    protected $casts = [
+        'create_at' => 'date',
+    ];
+
 
     public function user()
     {
