@@ -32,11 +32,20 @@
     <form action="{{ route('jadwal-shift.store') }}" method="POST">
         @csrf
 
-        <div class="mb-4">
-            <label class="block text-sm font-medium mb-2">Pilih Tanggal Senin</label>
-            <input type="date" name="start_date"
-                class="border rounded-lg px-4 py-2 w-64"
-                required>
+        <div class="flex gap-4 mb-4">
+            <div>
+                <label class="block text-sm font-medium mb-2">Tanggal Mulai</label>
+                <input type="date" name="tanggal_mulai"
+                    class="border rounded-lg px-4 py-2 w-64"
+                    required>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium mb-2">Tanggal Selesai</label>
+                <input type="date" name="tanggal_selesai"
+                    class="border rounded-lg px-4 py-2 w-64"
+                    required>
+            </div>
         </div>
 
         <div class="card">

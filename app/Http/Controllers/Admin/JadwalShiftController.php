@@ -25,36 +25,37 @@ class JadwalShiftController extends Controller
         $karyawans = [];
         $dates = [];
 
-        if ($request->start_date) {
+        if ($request->tanggal_mulai && $request->tanggal_selesai) {
 
-            $startDate = \Carbon\Carbon::parse($request->start_date);
+            $startDate = Carbon::parse($request->tanggal_mulai);
+            $endDate = Carbon::parse($request->tanggal_selesai);
 
-            if (!$startDate->isMonday()) {
-                return back()->with('error', 'Tanggal harus hari Senin!');
+            $dates = [];
+
+            while ($startDate <= $endDate) {
+                $dates[] = $startDate->copy();
+                $startDate->addDay();
             }
 
-            $dates = collect(range(0, 4))->map(function ($i) use ($startDate) {
-                return $startDate->copy()->addDays($i);
+            $karyawans = Karyawan::with(['user'])->get()->map(function ($karyawan) use ($dates) {
+
+                $schedule = [];
+
+                foreach ($dates as $date) {
+
+                    $jadwal = JadwalShift::where('karyawan_id', $karyawan->id)
+                        ->where('tanggal_mulai', '<=', $date)
+                        ->where('tanggal_selesai', '>=', $date)
+                        ->with('shift')
+                        ->first();
+
+                    $schedule[$date->format('Y-m-d')] = $jadwal;
+                }
+
+                $karyawan->weekly_schedule = $schedule;
+
+                return $karyawan;
             });
-
-            $karyawans = \App\Models\Karyawan::with(['user', 'jadwalShift.shift'])
-                ->get()
-                ->map(function ($karyawan) use ($dates) {
-
-                    $schedule = [];
-
-                    foreach ($dates as $date) {
-                        $jadwal = $karyawan->jadwalShift
-                            ->where('tanggal', $date->format('Y-m-d'))
-                            ->first();
-
-                        $schedule[$date->format('Y-m-d')] = $jadwal;
-                    }
-
-                    $karyawan->weekly_schedule = $schedule;
-
-                    return $karyawan;
-                });
         }
 
         return view('admin.jadwal_shift.preview', compact('karyawans', 'dates'));
@@ -63,35 +64,21 @@ class JadwalShiftController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'start_date' => 'required|date',
+            'tanggal_mulai' => 'required|date',
+            'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
             'shift' => 'required|array'
         ]);
 
-        $startDate = Carbon::parse($request->start_date);
-
-        // Pastikan hari Senin
-        if (!$startDate->isMonday()) {
-            return back()->with('error', 'Tanggal harus hari Senin!');
-        }
-
         foreach ($request->shift as $karyawan_id => $shift_id) {
 
-            for ($i = 0; $i < 5; $i++) {
-
-                $tanggal = $startDate->copy()->addDays($i);
-
-                JadwalShift::updateOrCreate(
-                    [
-                        'karyawan_id' => $karyawan_id,
-                        'tanggal' => $tanggal
-                    ],
-                    [
-                        'shift_id' => $shift_id
-                    ]
-                );
-            }
+            JadwalShift::create([
+                'karyawan_id' => $karyawan_id,
+                'shift_id' => $shift_id,
+                'tanggal_mulai' => $request->tanggal_mulai,
+                'tanggal_selesai' => $request->tanggal_selesai,
+            ]);
         }
 
-        return back()->with('success', 'Jadwal minggu berhasil disimpan.');
+        return back()->with('success', 'Jadwal shift periode berhasil disimpan.');
     }
 }

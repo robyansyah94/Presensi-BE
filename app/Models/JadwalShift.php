@@ -11,7 +11,8 @@ class JadwalShift extends Model
     protected $fillable = [
         'karyawan_id',
         'shift_id',
-        'tanggal'
+        'tanggal_mulai',
+        'tanggal_selesai',
     ];
 
     public function karyawan()
