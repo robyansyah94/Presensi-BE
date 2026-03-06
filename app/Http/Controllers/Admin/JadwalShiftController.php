@@ -69,16 +69,37 @@ class JadwalShiftController extends Controller
             'shift' => 'required|array'
         ]);
 
-        foreach ($request->shift as $karyawan_id => $shift_id) {
+        $tanggalMulai = Carbon::parse($request->tanggal_mulai);
+        $tanggalSelesai = Carbon::parse($request->tanggal_selesai);
 
-            JadwalShift::create([
-                'karyawan_id' => $karyawan_id,
-                'shift_id' => $shift_id,
-                'tanggal_mulai' => $request->tanggal_mulai,
-                'tanggal_selesai' => $request->tanggal_selesai,
-            ]);
+        // cek apakah ada Sabtu / Minggu di periode
+        $period = \Carbon\CarbonPeriod::create($tanggalMulai, $tanggalSelesai);
+
+        foreach ($period as $tanggal) {
+
+            if ($tanggal->isWeekend()) {
+
+                return back()->with(
+                    'error',
+                    'Tidak bisa membuat jadwal pada hari Sabtu dan Minggu.'
+                );
+            }
         }
 
-        return back()->with('success', 'Jadwal shift periode berhasil disimpan.');
+        // simpan jadwal shift
+        foreach ($request->shift as $karyawan_id => $shift_id) {
+
+            JadwalShift::updateOrCreate(
+                [
+                    'karyawan_id' => $karyawan_id,
+                    'tanggal_mulai' => $tanggalMulai,
+                    'tanggal_selesai' => $tanggalSelesai
+                ],
+                [
+                    'shift_id' => $shift_id
+                ]
+            );
+        }
+        return back()->with('success', 'Jadwal shift berhasil disimpan.');
     }
 }

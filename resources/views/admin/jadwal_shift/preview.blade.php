@@ -75,10 +75,21 @@
 
                     @php
                     $jadwal = $karyawan->weekly_schedule[$date->format('Y-m-d')] ?? null;
+                    $isWeekend = $date->isWeekend();
                     @endphp
 
                     <td class="px-4 py-3 text-center">
-                        @if($jadwal && $jadwal->shift)
+
+                        {{-- Jika Sabtu/Minggu --}}
+                        @if($isWeekend)
+
+                        <span class="text-red-600 font-semibold text-sm">
+                            Libur
+                        </span>
+
+                        {{-- Jika weekday dan ada jadwal --}}
+                        @elseif($jadwal && $jadwal->shift)
+
                         <div class="font-semibold">
                             {{ ucfirst($jadwal->shift->nama_shift) }}
                         </div>
@@ -88,12 +99,18 @@
                             -
                             {{ \Carbon\Carbon::parse($jadwal->shift->jam_pulang)->format('H:i') }}
                         </div>
+
+                        {{-- Jika weekday tapi belum ada jadwal --}}
                         @else
-                        <span class="text-gray-400 text-sm">
-                            Libur / Belum Diatur
+
+                        <span class="text-gray-400 text-sm italic">
+                            Belum diatur
                         </span>
+
                         @endif
+
                     </td>
+
                     @endforeach
                 </tr>
                 @endforeach

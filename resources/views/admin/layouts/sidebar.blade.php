@@ -6,7 +6,7 @@
         <!-- Sidenav Logo -->
         <div class="sticky top-0 flex h-topbar items-center justify-start px-6">
             <a href="{{ route('admin.dashboard') }}">
-                <img src="{{ asset('admin/images/logo-dark.png') }}" alt="logo" class="flex h-7">
+                <img src="{{ asset('admin/images/Presensi.png') }}" alt="logo" class="flex">
             </a>
         </div>
 
@@ -40,9 +40,21 @@
                     <a class="group flex items-center gap-x-3.5 rounded-md px-3 py-2 text-sm font-medium text-default-600 transition-all hover:bg-primary/5"
                         href="{{ route('jadwal-shift.preview') }}">
                         <i class="material-symbols-rounded" style="font-size: 21px;">
-                            schedule
+                            calendar_clock
                         </i>
                         Schedule
+                    </a>
+                </li>
+
+                <li class="px-3 py-2 text-xs uppercase font-medium text-default-500">ATTENDANCE</li>
+                
+                <li class="menu-item">
+                    <a class="group flex items-center gap-x-3.5 rounded-md px-3 py-2 text-sm font-medium text-default-600 transition-all hover:bg-primary/5"
+                        href="#">
+                        <i class="material-symbols-rounded" style="font-size: 21px;">
+                            history
+                        </i>
+                        History
                     </a>
                 </li>
 
@@ -72,7 +84,7 @@
                     <a class="group flex items-center gap-x-3.5 rounded-md px-3 py-2 text-sm font-medium text-default-600 transition-all hover:bg-primary/5"
                         href="{{ route('shift.index') }}">
                         <i class="material-symbols-rounded" style="font-size: 21px;">
-                            calendar_clock
+                            schedule
                         </i>
                         Shift
                     </a>
@@ -84,7 +96,7 @@
                         <i class="material-symbols-rounded" style="font-size: 21px;">
                             calendar_add_on
                         </i>
-                        Jadwal Shift
+                        Atur Schedule
                     </a>
                 </li>
 
