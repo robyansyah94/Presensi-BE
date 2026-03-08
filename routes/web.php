@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\Admin\QrPresensiController;
 use App\Http\Controllers\Admin\ShiftController;
 use App\Http\Controllers\Admin\JadwalShiftController;
+use App\Http\Controllers\Admin\LokasiKantorController;
 use App\Http\Controllers\Admin\UsersController;
 
 Route::get('/', function () {
@@ -47,4 +48,8 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     //attendance
     Route::get('/admin/attendance/history', [AttendanceController::class, 'history'])
         ->name('attendance.history');
+
+    // Lokasi Kantor
+    Route::resource('/lokasi-kantor', LokasiKantorController::class)
+        ->except(['show']);
 });
