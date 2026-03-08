@@ -52,4 +52,8 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     // Lokasi Kantor
     Route::resource('/lokasi-kantor', LokasiKantorController::class)
         ->except(['show']);
+
+    // Export attendance
+    Route::get('/admin/attendance/export', [AttendanceController::class, 'export'])
+        ->name('attendance.export');
 });

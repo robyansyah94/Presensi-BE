@@ -37,6 +37,20 @@
             </div>
 
             <div id="cal-grid" style="display:grid; grid-template-columns:repeat(7,1fr); row-gap:2px;"></div>
+
+            <div class="mt-4 pt-3 border-t border-default-200">
+                <a id="btn-export"
+                    href="{{ route('attendance.export', ['tanggal' => $tanggal]) }}"
+                    style="display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:9px 0; border-radius:8px; background:#16a34a; color:#fff; font-size:13px; font-weight:600; text-decoration:none; transition:background .15s;"
+                    onmouseover="this.style.background='#15803d'"
+                    onmouseout="this.style.background='#16a34a'">
+                    <i class="material-symbols-rounded" style="font-size:18px;">download</i>
+                    Export Excel
+                </a>
+                <p class="text-xs text-default-400 text-center mt-2">
+                    Data tanggal: <span class="font-medium text-default-600">{{ \Carbon\Carbon::parse($tanggal)->translatedFormat('d F Y') }}</span>
+                </p>
+            </div>
         </div>
     </div>
 

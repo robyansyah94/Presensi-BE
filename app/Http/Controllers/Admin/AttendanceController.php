@@ -7,6 +7,8 @@ use App\Models\Karyawan;
 use App\Models\Presensi;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Exports\AttendanceExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AttendanceController extends Controller
 {
@@ -25,10 +27,10 @@ class AttendanceController extends Controller
         // ── Ambil data presensi di tanggal ini ──────────────────────────
         // Eager load semua relasi yang dibutuhkan tabel
         $presensi = Presensi::with([
-                'karyawan.user',
-                'karyawan.jabatan',
-                'shift',
-            ])
+            'karyawan.user',
+            'karyawan.jabatan',
+            'shift',
+        ])
             ->where('tanggal', $tanggal)
             ->get();
 
@@ -52,5 +54,22 @@ class AttendanceController extends Controller
             'tanggal',
             'totalKaryawan',
         ));
+    }
+
+    //export
+    public function export(Request $request)
+    {
+        $tanggal = $request->get('tanggal', Carbon::today()->toDateString());
+
+        // Validasi format tanggal
+        try {
+            Carbon::parse($tanggal);
+        } catch (\Exception $e) {
+            $tanggal = Carbon::today()->toDateString();
+        }
+
+        $namaFile = 'attendance_' . $tanggal . '.xlsx';
+
+        return Excel::download(new AttendanceExport($tanggal), $namaFile);
     }
 }
