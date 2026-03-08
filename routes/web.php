@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AttendanceController;
 use App\Http\Controllers\Admin\JabatanController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AdminAuthController;
@@ -42,4 +43,8 @@ Route::prefix('admin')->middleware('auth')->group(function () {
         Route::post('/store', [JadwalShiftController::class, 'store'])->name('store');
         Route::get('/preview', [JadwalShiftController::class, 'preview'])->name('preview');
     });
+
+    //attendance
+    Route::get('/admin/attendance/history', [AttendanceController::class, 'history'])
+        ->name('attendance.history');
 });

@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Karyawan;
+use App\Models\Presensi;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -41,8 +42,9 @@ class AdminAuthController extends Controller
     public function dashboard()
     {
         $totalKaryawan = Karyawan::count();
-
-        return view('admin.dashboard', compact('totalKaryawan') );
+        $totalKehadiran = Presensi::count();
+        
+        return view('admin.dashboard', compact('totalKaryawan', 'totalKehadiran') );
     }
 
     public function karyawan()

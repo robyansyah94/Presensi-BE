@@ -10,14 +10,6 @@
 
     <div class="md:flex hidden items-center gap-3 text-sm font-semibold">
         <a href="#" class="text-sm font-medium text-default-700">Tailzon</a>
-
-        <i class="i-tabler-chevron-right text-lg shrink-0 text-default-500 rtl:rotate-180"></i>
-
-        <a href="#" class="text-sm font-medium text-default-700">Menu</a>
-
-        <i class="i-tabler-chevron-right text-lg shrink-0 text-default-500 rtl:rotate-180"></i>
-
-        <a href="#" class="text-sm font-medium text-default-700" aria-current="page">Dashboard</a>
     </div>
 </div>
 <!-- Page Title End -->
@@ -48,7 +40,7 @@
                 <div>
                     <p class="text-xs tracking-wide font-semibold uppercase text-default-700 mb-3">
                         Kehadiran</p>
-                    <h4 class="font-semibold text-2xl text-default-700">5</h4>
+                    <h4 class="font-semibold text-2xl text-default-700">{{ $totalKehadiran }}</h4>
                 </div>
 
                 <div

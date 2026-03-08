@@ -16,7 +16,7 @@
                 </a>
 
                 <!-- Topbar Search -->
-                <div class="md:flex hidden items-center relative">
+                <!-- <div class="md:flex hidden items-center relative">
                     <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                         <i class="i-tabler-search text-base"></i>
                     </div>
@@ -26,48 +26,10 @@
                     <button type="button" class="absolute inset-y-0 end-0 flex items-center pe-3">
                         <i class="i-tabler-microphone text-base hover:text-black"></i>
                     </button>
-                </div>
+                </div> -->
             </div>
 
             <div class="flex items-center gap-5">
-                <!-- Language Dropdown Button -->
-                <div class="hs-dropdown relative inline-flex [--placement:bottom-right]">
-                    <button type="button"
-                        class="hs-dropdown-toggle inline-flex items-center p-2 rounded-lg bg-white border border-default-200 hover:bg-primary/15 hover:text-primary transition-all">
-                        <i class="i-lucide-globe text-2xl"></i>
-                    </button>
-
-                    <div
-                        class="hs-dropdown-menu duration mt-2 min-w-48 rounded-lg border border-default-200 bg-white p-2 opacity-0 shadow-md transition-[opacity,margin] hs-dropdown-open:opacity-100 hidden">
-                        <a href="javascript:void(0);"
-                            class="flex items-center gap-2.5 py-2 px-3 rounded-md text-sm text-default-800 hover:bg-default-100">
-                            <img src="{{ asset('admin/images/flags/germany.jpg') }}" alt="user-image" class="h-4">
-                            <span class="align-middle">German</span>
-                        </a>
-
-                        <!-- item-->
-                        <a href="javascript:void(0);"
-                            class="flex items-center gap-2.5 py-2 px-3 rounded-md text-sm text-default-800 hover:bg-default-100">
-                            <img src="{{ asset('admin/images/flags/italy.jpg') }}" alt="user-image" class="h-4">
-                            <span class="align-middle">Italian</span>
-                        </a>
-
-                        <!-- item-->
-                        <a href="javascript:void(0);"
-                            class="flex items-center gap-2.5 py-2 px-3 rounded-md text-sm text-default-800 hover:bg-default-100">
-                            <img src="{{ asset('admin/images/flags/spain.jpg') }}" alt="user-image" class="h-4">
-                            <span class="align-middle">Spanish</span>
-                        </a>
-
-                        <!-- item-->
-                        <a href="javascript:void(0);"
-                            class="flex items-center gap-2.5 py-2 px-3 rounded-md text-sm text-default-800 hover:bg-default-100">
-                            <img src="{{ asset('admin/images/flags/russia.jpg') }}" alt="user-image" class="h-4">
-                            <span class="align-middle">Russian</span>
-                        </a>
-                    </div>
-                </div>
-
                 <!-- Notification Dropdown Button -->
                 <div class="hs-dropdown relative inline-flex [--placement:bottom-right]">
                     <button type="button"
