@@ -56,4 +56,8 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     // Export attendance
     Route::get('/admin/attendance/export', [AttendanceController::class, 'export'])
         ->name('attendance.export');
+
+    // Export attendance bulanan
+    Route::get('/admin/attendance/export/monthly', [AttendanceController::class, 'exportMonthly'])
+        ->name('attendance.export.monthly');
 });

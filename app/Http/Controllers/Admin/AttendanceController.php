@@ -8,6 +8,7 @@ use App\Models\Presensi;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Exports\AttendanceExport;
+use App\Exports\AttendanceMonthlyExport;
 use Maatwebsite\Excel\Facades\Excel;
 
 class AttendanceController extends Controller
@@ -68,8 +69,26 @@ class AttendanceController extends Controller
             $tanggal = Carbon::today()->toDateString();
         }
 
-        $namaFile = 'attendance_' . $tanggal . '.xlsx';
+        $namaFile = 'Attendance_' . $tanggal . '.xlsx';
 
         return Excel::download(new AttendanceExport($tanggal), $namaFile);
+    }
+
+    //export bulanan
+    public function exportMonthly(Request $request)
+    {
+        $bulan = $request->get('bulan', Carbon::today()->format('Y-m'));
+
+        // Validasi format Y-m
+        try {
+            Carbon::createFromFormat('Y-m', $bulan);
+        } catch (\Exception $e) {
+            $bulan = Carbon::today()->format('Y-m');
+        }
+
+        $label    = Carbon::createFromFormat('Y-m', $bulan)->locale('id')->isoFormat('MMMM_YYYY');
+        $namaFile = "Attendance_{$label}.xlsx";
+
+        return Excel::download(new AttendanceMonthlyExport($bulan), $namaFile);
     }
 }

@@ -38,18 +38,28 @@
 
             <div id="cal-grid" style="display:grid; grid-template-columns:repeat(7,1fr); row-gap:2px;"></div>
 
-            <div class="mt-4 pt-3 border-t border-default-200">
+            <div class="mt-4 pt-3 border-t border-default-200 flex flex-col gap-2">
+
+                {{-- Export Harian --}}
                 <a id="btn-export"
                     href="{{ route('attendance.export', ['tanggal' => $tanggal]) }}"
                     style="display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:9px 0; border-radius:8px; background:#16a34a; color:#fff; font-size:13px; font-weight:600; text-decoration:none; transition:background .15s;"
                     onmouseover="this.style.background='#15803d'"
                     onmouseout="this.style.background='#16a34a'">
-                    <i class="material-symbols-rounded" style="font-size:18px;">download</i>
-                    Export Excel
+                    <i class="material-symbols-rounded" style="font-size:16px;">today</i>
+                    Export {{ \Carbon\Carbon::parse($tanggal)->translatedFormat('d F Y') }}
                 </a>
-                <p class="text-xs text-default-400 text-center mt-2">
-                    Data tanggal: <span class="font-medium text-default-600">{{ \Carbon\Carbon::parse($tanggal)->translatedFormat('d F Y') }}</span>
-                </p>
+
+                {{-- Export Bulanan --}}
+                @php $bulan = \Carbon\Carbon::parse($tanggal)->format('Y-m'); @endphp
+                <a href="{{ route('attendance.export.monthly', ['bulan' => $bulan]) }}"
+                    style="display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:9px 0; border-radius:8px; background:#2563eb; color:#fff; font-size:13px; font-weight:600; text-decoration:none; transition:background .15s;"
+                    onmouseover="this.style.background='#1d4ed8'"
+                    onmouseout="this.style.background='#2563eb'">
+                    <i class="material-symbols-rounded" style="font-size:16px;">calendar_month</i>
+                    Export {{ \Carbon\Carbon::parse($tanggal)->translatedFormat('F Y') }}
+                </a>
+
             </div>
         </div>
     </div>
