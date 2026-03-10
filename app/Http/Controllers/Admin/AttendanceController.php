@@ -15,36 +15,37 @@ class AttendanceController extends Controller
 {
     public function history(Request $request)
     {
-        // Default: hari ini
         $tanggal = $request->get('tanggal', Carbon::today()->toDateString());
 
-        // Validasi format tanggal supaya tidak error
         try {
             Carbon::parse($tanggal);
         } catch (\Exception $e) {
             $tanggal = Carbon::today()->toDateString();
         }
 
-        // ── Ambil data presensi di tanggal ini ──────────────────────────
-        // Eager load semua relasi yang dibutuhkan tabel
+        // Presensi hari ini — diurutkan A-Z by nama
         $presensi = Presensi::with([
             'karyawan.user',
             'karyawan.jabatan',
             'shift',
         ])
             ->where('tanggal', $tanggal)
-            ->get();
+            ->get()
+            ->sortBy(fn($p) => strtolower($p->karyawan->user->name ?? ''))
+            ->values();
 
-        // ── Semua karyawan aktif ─────────────────────────────────────────
+        // Semua karyawan aktif — diurutkan A-Z by nama via JOIN
         $semuaKaryawan = Karyawan::with(['user', 'jabatan', 'jadwalShift.shift'])
             ->where('status', 'aktif')
+            ->join('users', 'users.id', '=', 'karyawan.users_id')
+            ->orderByRaw('LOWER(users.name) ASC')
+            ->select('karyawan.*')
             ->get();
 
         $totalKaryawan = $semuaKaryawan->count();
 
-        // ── Karyawan yang ALPA (tidak ada di tabel presensi hari ini) ────
-        $hadirIds = $presensi->pluck('karyawan_id')->toArray();
-
+        // Karyawan alpa — urutan ikut $semuaKaryawan yang sudah A-Z
+        $hadirIds     = $presensi->pluck('karyawan_id')->toArray();
         $karyawanAlpa = $semuaKaryawan->filter(
             fn($k) => !in_array($k->id, $hadirIds)
         );
@@ -57,12 +58,10 @@ class AttendanceController extends Controller
         ));
     }
 
-    //export
     public function export(Request $request)
     {
         $tanggal = $request->get('tanggal', Carbon::today()->toDateString());
 
-        // Validasi format tanggal
         try {
             Carbon::parse($tanggal);
         } catch (\Exception $e) {
@@ -74,12 +73,10 @@ class AttendanceController extends Controller
         return Excel::download(new AttendanceExport($tanggal), $namaFile);
     }
 
-    //export bulanan
     public function exportMonthly(Request $request)
     {
         $bulan = $request->get('bulan', Carbon::today()->format('Y-m'));
 
-        // Validasi format Y-m
         try {
             Carbon::createFromFormat('Y-m', $bulan);
         } catch (\Exception $e) {
