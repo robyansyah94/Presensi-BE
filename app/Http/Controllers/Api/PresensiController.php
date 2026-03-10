@@ -14,16 +14,14 @@ class PresensiController extends Controller
 {
     public function scan(Request $request)
     {
-        // VALIDASI INPUT
-        // Sekarang wajib kirim latitude & longitude dari frontend
+        // ── VALIDASI INPUT ────────────────────────────────────────────────────
         $request->validate([
             'qr_token'  => 'required|string',
             'latitude'  => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
         ]);
 
-        // STEP A: Validasi QR Token 
-        // Cek apakah QR yang di-scan valid, aktif, dan belum expired
+        // ── STEP A: Validasi QR Token ─────────────────────────────────────────
         $qr = QrPresensi::where('qr_token', $request->qr_token)
             ->where('is_active', true)
             ->where('expired_at', '>=', now())
@@ -35,8 +33,8 @@ class PresensiController extends Controller
             ], 400);
         }
 
-        // STEP B: Ambil Data Karyawan 
-        $user     = $request->user(); // dari token Sanctum
+        // ── STEP B: Ambil Data Karyawan ───────────────────────────────────────
+        $user     = $request->user();
         $karyawan = Karyawan::where('users_id', $user->id)->first();
 
         if (!$karyawan) {
@@ -45,8 +43,8 @@ class PresensiController extends Controller
             ], 404);
         }
 
-        // STEP C: Validasi GPS / Lokasi 
-        $lokasi = LokasiKantor::first(); // 1 kantor saja
+        // ── STEP C: Validasi GPS ──────────────────────────────────────────────
+        $lokasi = LokasiKantor::first();
 
         if (!$lokasi) {
             return response()->json([
@@ -54,8 +52,6 @@ class PresensiController extends Controller
             ], 500);
         }
 
-        // Hitung jarak antara posisi karyawan dengan posisi kantor
-        // menggunakan rumus Haversine (akurat untuk koordinat GPS)
         $jarak = $this->hitungJarak(
             $request->latitude,
             $request->longitude,
@@ -63,7 +59,6 @@ class PresensiController extends Controller
             $lokasi->longitude
         );
 
-        // Tolak kalau di luar radius yang ditentukan admin
         if ($jarak > $lokasi->radius_meter) {
             return response()->json([
                 'message'       => "Anda berada di luar area kantor. Jarak Anda: {$jarak}m, batas maksimum: {$lokasi->radius_meter}m.",
@@ -72,9 +67,7 @@ class PresensiController extends Controller
             ], 403);
         }
 
-        // sTEP D: Cari Shift Aktif Karyawan Hari Ini
-        // SEBELUM (kode lama): 'shift_id' => 2  ← hardcode, salah!
-        // SESUDAH: ambil dari tabel jadwal_shift berdasarkan tanggal hari ini
+        // ── STEP D: Cari Shift Aktif ──────────────────────────────────────────
         $today  = now()->toDateString();
         $jadwal = JadwalShift::where('karyawan_id', $karyawan->id)
             ->where('tanggal_mulai', '<=', $today)
@@ -90,22 +83,50 @@ class PresensiController extends Controller
 
         $shift = $jadwal->shift;
 
-        // Tentukan Status (Hadir / Terlambat)
-        // Bandingkan jam sekarang dengan jam_masuk shift + toleransi
-        $jamMasukShift  = now()->setTimeFromTimeString($shift->jam_masuk);
-        $batasTerlambat = $jamMasukShift->copy()->addMinutes($shift->toleransi_telat);
-        $status         = now()->gt($batasTerlambat) ? 'terlambat' : 'hadir';
-
-        // STEP F: Catat Presensi
+        // ── STEP E: Cek Presensi Hari Ini ─────────────────────────────────────
         $presensi = Presensi::where('karyawan_id', $karyawan->id)
             ->where('tanggal', $today)
             ->first();
 
-        // Belum ada presensi hari ini → CHECK-IN
+        // ── STEP F: Logika CHECK-IN ───────────────────────────────────────────
         if (!$presensi) {
+
+            // Waktu jam masuk shift (hari ini)
+            $jamMasukShift = now()->setTimeFromTimeString($shift->jam_masuk);
+
+            // Batas paling awal boleh check-in: 60 menit sebelum jam masuk
+            $batasAwalCheckin = $jamMasukShift->copy()->subMinutes(60);
+
+            // Batas paling akhir boleh check-in: 60 menit setelah jam masuk
+            // (toleransi_telat hanya untuk menentukan status, bukan batas check-in)
+            $batasAkhirCheckin = $jamMasukShift->copy()->addMinutes(60);
+
+            $sekarang = now();
+
+            // Terlalu awal
+            if ($sekarang->lt($batasAwalCheckin)) {
+                $mulaiStr = $batasAwalCheckin->format('H:i');
+                return response()->json([
+                    'message' => "Presensi masuk belum bisa dilakukan. Anda bisa check-in mulai jam {$mulaiStr} (60 menit sebelum shift).",
+                ], 403);
+            }
+
+            // Terlalu telat (lebih dari 60 menit setelah jam masuk)
+            if ($sekarang->gt($batasAkhirCheckin)) {
+                $batasStr    = $batasAkhirCheckin->format('H:i');
+                $jamMasukStr = $jamMasukShift->format('H:i');
+                return response()->json([
+                    'message' => "Waktu check-in sudah berakhir. Batas check-in untuk shift ini adalah jam {$batasStr} (60 menit setelah jam masuk {$jamMasukStr}).",
+                ], 403);
+            }
+
+            // Tentukan status: hadir atau terlambat
+            $batasTerlambat = $jamMasukShift->copy()->addMinutes($shift->toleransi_telat);
+            $status         = $sekarang->gt($batasTerlambat) ? 'terlambat' : 'hadir';
+
             Presensi::create([
                 'karyawan_id'       => $karyawan->id,
-                'shift_id'          => $shift->id, // ← sekarang dinamis!
+                'shift_id'          => $shift->id,
                 'tanggal'           => $today,
                 'jam_masuk'         => now()->toTimeString(),
                 'status'            => $status,
@@ -124,8 +145,23 @@ class PresensiController extends Controller
             ]);
         }
 
-        // Sudah check-in, belum check-out → CHECK-OUT
+        // ── STEP G: Logika CHECK-OUT ──────────────────────────────────────────
         if (!$presensi->jam_pulang) {
+
+            // Batas paling awal boleh check-out: 30 menit sebelum jam pulang shift
+            $jamPulangShift    = now()->setTimeFromTimeString($shift->jam_pulang);
+            $batasAwalCheckout = $jamPulangShift->copy()->subMinutes(30);
+
+            $sekarang = now();
+
+            if ($sekarang->lt($batasAwalCheckout)) {
+                $mulaiStr    = $batasAwalCheckout->format('H:i');
+                $jamPulangStr = $jamPulangShift->format('H:i');
+                return response()->json([
+                    'message' => "Presensi pulang belum bisa dilakukan. Anda bisa check-out mulai jam {$mulaiStr} (30 menit sebelum jam pulang {$jamPulangStr}).",
+                ], 403);
+            }
+
             $presensi->update([
                 'jam_pulang'        => now()->toTimeString(),
                 'latitude'          => $request->latitude,
@@ -139,16 +175,16 @@ class PresensiController extends Controller
             ]);
         }
 
-        // Sudah check-in & check-out → tolak
+        // ── STEP H: Sudah check-in & check-out ───────────────────────────────
         return response()->json([
             'message' => 'Anda sudah melakukan presensi masuk dan pulang hari ini.',
         ], 400);
     }
-    
-    // Menghitung jarak (meter) antara dua koordinat GPS dengan akurat
+
+    // ── Haversine formula ─────────────────────────────────────────────────────
     private function hitungJarak(float $lat1, float $lon1, float $lat2, float $lon2): float
     {
-        $R    = 6371000; // radius bumi dalam meter
+        $R    = 6371000;
         $dLat = deg2rad($lat2 - $lat1);
         $dLon = deg2rad($lon2 - $lon1);
 
@@ -157,6 +193,6 @@ class PresensiController extends Controller
 
         $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
 
-        return round($R * $c, 2); // hasil dalam meter, 2 angka desimal
+        return round($R * $c, 2);
     }
 }
