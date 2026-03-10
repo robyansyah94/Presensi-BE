@@ -40,12 +40,17 @@ class RiwayatPresensiController extends Controller
             ->get()
             ->map(function ($p) {
                 // Hitung total jam kerja
+                // Paksa parse sebagai time-only agar tidak terpengaruh komponen tanggal
                 $totalHours = null;
                 if ($p->jam_masuk && $p->jam_pulang) {
-                    $masuk  = Carbon::parse($p->jam_masuk);
-                    $pulang = Carbon::parse($p->jam_pulang);
-                    $diff   = $masuk->diff($pulang);
-                    $totalHours = sprintf('%02d:%02d', $diff->h + ($diff->days * 24), $diff->i);
+                    // Gabungkan dengan tanggal yang sama agar diff akurat
+                    $tglStr = Carbon::parse($p->tanggal)->toDateString();
+                    $masuk  = Carbon::parse($tglStr . ' ' . Carbon::parse($p->jam_masuk)->format('H:i:s'));
+                    $pulang = Carbon::parse($tglStr . ' ' . Carbon::parse($p->jam_pulang)->format('H:i:s'));
+                    // Jika pulang < masuk (shift lewat tengah malam), tambah 1 hari
+                    if ($pulang->lte($masuk)) $pulang->addDay();
+                    $diffMenit  = $masuk->diffInMinutes($pulang);
+                    $totalHours = sprintf('%02d:%02d', intdiv($diffMenit, 60), $diffMenit % 60);
                 }
 
                 $tgl = Carbon::parse($p->tanggal);
