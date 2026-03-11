@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AssessmentCategoryController;
 use App\Http\Controllers\Admin\AttendanceController;
 use App\Http\Controllers\Admin\JabatanController;
 use Illuminate\Support\Facades\Route;
@@ -60,4 +61,18 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     // Export attendance bulanan
     Route::get('/admin/attendance/export/monthly', [AttendanceController::class, 'exportMonthly'])
         ->name('attendance.export.monthly');
+
+
+    // -----IEU PENILAIAN-----------------------------------
+
+    // Assessment - Kategori
+    Route::prefix('assessment')->name('admin.assessment.')->group(function () {
+        // Resource otomatis generate: index, create, store, show, edit, update, destroy
+        Route::resource('categories', AssessmentCategoryController::class)
+            ->except(['show']); // tidak pakai halaman show/detail
+
+        //route custom untuk toggle aktif/nonaktif
+        Route::patch('categories/{category}/toggle', [AssessmentCategoryController::class, 'toggleActive'])
+            ->name('categories.toggle');
+    });
 });

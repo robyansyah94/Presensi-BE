@@ -42,17 +42,13 @@ class AssessmentCategoryController extends Controller
             ->with('success', 'Kategori penilaian berhasil ditambahkan.');
     }
 
-    /**
-     * Form edit kategori
-     */
+    // Form edit kategori
     public function edit(AssessmentCategory $category)
     {
-        return view('admin.assessment.categories.edit', compact('category'));
+        return view('admin.assessment.categories.create', compact('category'));
     }
 
-    /**
-     * Update kategori
-     */
+    // Update kategori
     public function update(Request $request, AssessmentCategory $category)
     {
         $request->validate([
@@ -72,9 +68,7 @@ class AssessmentCategoryController extends Controller
             ->with('success', 'Kategori penilaian berhasil diperbarui.');
     }
 
-    /**
-     * Toggle aktif / nonaktif kategori
-     */
+    // Toggle aktif / nonaktif kategori
     public function toggleActive(AssessmentCategory $category)
     {
         $category->update(['is_active' => !$category->is_active]);
