@@ -3,11 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Assessment extends Model
 {
-    protected $table = 'assessments';
-
     protected $fillable = [
         'evaluator_id',
         'evaluatee_id',
@@ -21,36 +21,32 @@ class Assessment extends Model
         'assessment_date' => 'date',
     ];
 
-    /**
-     * Admin yang menilai
-     */
-    public function evaluator()
+    //Relasi
+    public function evaluator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'evaluator_id');
     }
 
-    /**
-     * Karyawan yang dinilai
-     */
-    public function evaluatee()
+    public function evaluatee(): BelongsTo
     {
         return $this->belongsTo(Karyawan::class, 'evaluatee_id');
     }
 
-    /**
-     * Detail nilai per kategori
-     */
-    public function details()
+    public function details(): HasMany
     {
-        return $this->hasMany(AssessmentDetail::class, 'assessment_id');
+        return $this->hasMany(AssessmentDetail::class);
     }
 
-    /**
-     * Rata-rata nilai semua kategori
-     */
+    //Accessor average_score
     public function getAverageScoreAttribute(): float
     {
-        $avg = $this->details()->avg('score');
-        return round($avg ?? 0, 1);
+        // Gunakan relasi yang sudah di-load (hindari query tambahan)
+        $details = $this->relationLoaded('details')
+            ? $this->details
+            : $this->details()->get();
+
+        if ($details->isEmpty()) return 0;
+
+        return round($details->avg('score'), 1);
     }
 }

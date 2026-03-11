@@ -18,7 +18,7 @@ class AssessmentController extends Controller
      */
     public function index(Request $request)
     {
-        $period      = $request->get('period', 'bulanan');
+        $period      = 'bulanan';
         $periodLabel = $this->buildPeriodLabel($period);
 
         // Semua karyawan aktif
@@ -64,7 +64,7 @@ class AssessmentController extends Controller
      */
     public function create(Request $request, Karyawan $karyawan)
     {
-        $period      = $request->get('period', 'bulanan');
+        $period      = 'bulanan';
         $periodLabel = $this->buildPeriodLabel($period);
 
         // Cek apakah sudah pernah dinilai periode ini
@@ -136,21 +136,8 @@ class AssessmentController extends Controller
             }
         });
 
-        // Cek apakah ada karyawan berikutnya yang belum dinilai
-        $nextKaryawan = $this->getNextUnnilaiKaryawan(
-            $request->evaluatee_id,
-            $request->period,
-            $request->period_label
-        );
-
-        if ($nextKaryawan) {
-            return redirect()
-                ->route('admin.assessment.create', [$nextKaryawan->id, 'period' => $request->period])
-                ->with('success', 'Penilaian berhasil disimpan. Lanjut ke karyawan berikutnya!');
-        }
-
         return redirect()->route('admin.assessment.index', ['period' => $request->period])
-            ->with('success', 'Penilaian berhasil disimpan. Semua karyawan sudah dinilai! 🎉');
+            ->with('success', 'Penilaian berhasil disimpan.');
     }
 
     /**
@@ -223,7 +210,7 @@ class AssessmentController extends Controller
         $karyawan->load(['user', 'jabatan']);
 
         // Ambil semua riwayat penilaian, urutkan dari terbaru
-        $assessments = Assessment::with(['details.category'])
+        $assessments = Assessment::with(['details.category', 'evaluator'])
             ->where('evaluatee_id', $karyawan->id)
             ->orderByDesc('assessment_date')
             ->get();
