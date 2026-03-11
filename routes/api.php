@@ -6,7 +6,7 @@ use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Api\AssessmentApiController;
-
+use App\Http\Controllers\Api\PengajuanApiController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -15,6 +15,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/presensi/scan', [PresensiController::class, 'scan']);
 
     Route::get('/presensi/riwayat', [RiwayatPresensiController::class, 'index']);
+
+    Route::get('/pengajuan', [PengajuanApiController::class, 'index']);
+    
+    Route::post('/pengajuan', [PengajuanApiController::class, 'store']);
 
     Route::get('/me', function (Request $request) {
         $user = $request->user()->load('karyawan.jabatan');

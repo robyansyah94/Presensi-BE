@@ -5,40 +5,40 @@
 @section('content')
 
 @php
-$bulanStr = \Carbon\Carbon::parse($tanggal)->format('Y-m');
-$bulanLabel = \Carbon\Carbon::parse($tanggal)->translatedFormat('F Y');
+    $bulanStr = \Carbon\Carbon::parse($tanggal)->format('Y-m');
+    $bulanLabel = \Carbon\Carbon::parse($tanggal)->translatedFormat('F Y');
 
-// Data rekap bulanan untuk tabel bulan
-$startBulan = \Carbon\Carbon::parse($tanggal)->startOfMonth();
-$endBulan = \Carbon\Carbon::parse($tanggal)->endOfMonth();
+    // Data rekap bulanan untuk tabel bulan
+    $startBulan = \Carbon\Carbon::parse($tanggal)->startOfMonth();
+    $endBulan   = \Carbon\Carbon::parse($tanggal)->endOfMonth();
 
-// Hitung hari kerja (Senin-Jumat) bulan ini
-$hariKerja = 0;
-$cur = $startBulan->copy();
-while ($cur->lte($endBulan)) {
-if (!$cur->isWeekend()) $hariKerja++;
-$cur->addDay();
-}
+    // Hitung hari kerja (Senin-Jumat) bulan ini
+    $hariKerja = 0;
+    $cur = $startBulan->copy();
+    while ($cur->lte($endBulan)) {
+        if (!$cur->isWeekend()) $hariKerja++;
+        $cur->addDay();
+    }
 
-// Rekap per karyawan untuk bulan ini
-$rekapBulanan = \App\Models\Karyawan::with(['user','jabatan'])
-->where('status','aktif')
-->get()
-->map(function($k) use ($startBulan, $endBulan, $hariKerja) {
-$p = \App\Models\Presensi::where('karyawan_id', $k->id)
-->whereBetween('tanggal', [$startBulan->toDateString(), $endBulan->toDateString()])
-->get();
-$hadir = $p->where('status','hadir')->count();
-$terlambat = $p->where('status','terlambat')->count();
-$totalMasuk = $hadir + $terlambat;
-$alpa = max($hariKerja - $totalMasuk, 0);
-$persen = $hariKerja > 0 ? round(($totalMasuk / $hariKerja) * 100, 1) : 0;
-return compact('k','hadir','terlambat','alpa','totalMasuk','persen');
-})
-->sortBy(fn($r) => strtolower($r['k']->user->name ?? ''));
+    // Rekap per karyawan untuk bulan ini
+    $rekapBulanan = \App\Models\Karyawan::with(['user','jabatan'])
+        ->where('status','aktif')
+        ->get()
+        ->map(function($k) use ($startBulan, $endBulan, $hariKerja) {
+            $p = \App\Models\Presensi::where('karyawan_id', $k->id)
+                ->whereBetween('tanggal', [$startBulan->toDateString(), $endBulan->toDateString()])
+                ->get();
+            $hadir     = $p->where('status','hadir')->count();
+            $terlambat = $p->where('status','terlambat')->count();
+            $totalMasuk = $hadir + $terlambat;
+            $alpa      = max($hariKerja - $totalMasuk, 0);
+            $persen    = $hariKerja > 0 ? round(($totalMasuk / $hariKerja) * 100, 1) : 0;
+            return compact('k','hadir','terlambat','alpa','totalMasuk','persen');
+        })
+        ->sortBy(fn($r) => strtolower($r['k']->user->name ?? ''));
 @endphp
 
-<!-- Page Title -->
+{{-- Page Title --}}
 <div class="flex items-center justify-between flex-wrap gap-2 mb-5">
     <h4 class="text-default-900 text-lg font-semibold">HISTORY ATTENDANCE</h4>
     <span class="text-sm text-default-500" id="page-label">
@@ -50,8 +50,8 @@ return compact('k','hadir','terlambat','alpa','totalMasuk','persen');
 </div>
 
 <div style="display:flex; flex-direction:row; gap:20px; align-items:flex-start;">
-    <!--  -->
-    <!--  KOLOM KIRI: KALENDER ─ -->
+
+    {{-- ── KOLOM KIRI: KALENDER ─────────────────────────────────────── --}}
     <div style="width:288px; flex-shrink:0;">
         <div class="card p-4">
             <div class="flex items-center justify-between mb-4">
@@ -72,70 +72,68 @@ return compact('k','hadir','terlambat','alpa','totalMasuk','persen');
 
             <div id="cal-grid" style="display:grid; grid-template-columns:repeat(7,1fr); row-gap:2px;"></div>
 
-            <!--  Tombol bawah kalender  -->
-            <div class="mt-4 pt-4 border-t border-default-200 flex flex-col gap-3">
+            {{-- ── Tombol bawah kalender ── --}}
+            <div class="mt-4 pt-3 border-t border-default-200 flex flex-col gap-2">
 
-                <!-- Tombol Rekap Bulanan -->
+                {{-- Tombol Rekap Bulanan --}}
                 <button type="button" onclick="toggleView('monthly')" id="btn-show-monthly"
-                    style="display:flex; align-items:center; justify-content:center; gap:10px; width:100%; padding:10px 0; border-radius:10px; background:#fff; border:1px solid #e2e8f0; color:#475569; font-size:13px; font-weight:600; cursor:pointer; transition:all .2s ease; box-shadow: 0 1px 2px rgba(0,0,0,0.05);"
-                    onmouseover="this.style.background='#f8fafc'; this.style.borderColor='#cbd5e1'; this.style.color='#1e293b'"
-                    onmouseout="this.style.background='#fff'; this.style.borderColor='#e2e8f0'; this.style.color='#475569'">
-                    <i class="material-symbols-rounded" style="font-size:18px;">analytics</i>
+                    style="display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:9px 0; border-radius:8px; background:#f8fafc; border:1.5px solid #e2e8f0; color:#475569; font-size:13px; font-weight:600; cursor:pointer; transition:all .15s;"
+                    onmouseover="this.style.background='#f1f5f9'"
+                    onmouseout="this.style.background='#f8fafc'">
+                    <i class="material-symbols-rounded" style="font-size:16px;">bar_chart</i>
                     <span id="btn-monthly-label">Rekap {{ $bulanLabel }}</span>
                 </button>
 
-                <!-- Tombol Export dengan dropdown -->
+                {{-- Tombol Export dengan dropdown --}}
                 <div style="position:relative;">
-                    <button type="button" onclick="toggleExportDropdown()" id="btn-export-main"
-                        style="display:flex; align-items:center; gap:10px; width:100%; padding:10px 16px; border-radius:10px; background:#4f46e5; color:#fff; font-size:13px; font-weight:600; border:none; cursor:pointer; transition:all .2s ease; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);"
-                        onmouseover="this.style.background='#4338ca'; this.style.transform='translateY(-1px)'"
-                        onmouseout="this.style.background='#4f46e5'; this.style.transform='translateY(0)'">
-                        <i class="material-symbols-rounded" style="font-size:18px;">download</i>
-                        <span>Export Data</span>
-                        <i class="material-symbols-rounded" style="font-size:18px; margin-left:auto; transition: transform .2s;" id="export-icon">expand_more</i>
+                    <button type="button" onclick="toggleExportDropdown()"
+                        style="display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:9px 0; border-radius:8px; background:#4f46e5; color:#fff; font-size:13px; font-weight:600; border:none; cursor:pointer; transition:background .15s;"
+                        onmouseover="this.style.background='#4338ca'"
+                        onmouseout="this.style.background='#4f46e5'">
+                        <i class="material-symbols-rounded" style="font-size:16px;">download</i>
+                        Export
+                        <i class="material-symbols-rounded" style="font-size:16px; margin-left:auto;">expand_more</i>
                     </button>
 
-                    <!-- Dropdown -->
+                    {{-- Dropdown --}}
                     <div id="export-dropdown"
-                        style="display:none; position:absolute; bottom:calc(100% + 10px); left:0; right:0; background:#fff; border-radius:12px; box-shadow:0 12px 30px rgba(0,0,0,0.15); border:1px solid #e2e8f0; overflow:hidden; z-index:50; animation: slideUp 0.2s ease-out;">
-
+                        style="display:none; position:absolute; bottom:calc(100% + 6px); left:0; right:0; background:#fff; border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,0.12); border:1px solid #e2e8f0; overflow:hidden; z-index:50;">
                         <a href="{{ route('attendance.export', ['tanggal' => $tanggal]) }}"
-                            style="display:flex; align-items:center; gap:12px; padding:12px 16px; text-decoration:none; color:#1e293b; transition:background .15s;"
+                            style="display:flex; align-items:center; gap:10px; padding:11px 14px; text-decoration:none; color:#1e293b; font-size:13px; font-weight:500; transition:background .15s;"
                             onmouseover="this.style.background='#f8fafc'"
                             onmouseout="this.style.background='#fff'">
-                            <div style="width:36px; height:36px; border-radius:8px; background:#ecfdf5; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                                <i class="material-symbols-rounded" style="font-size:18px; color:#10b981;">description</i>
-                            </div>
-                            <div style="display:flex; flex-direction:column;">
-                                <span style="font-size:13px; font-weight:700; color:#334155;">Export Harian</span>
-                                <span style="font-size:11px; color:#94a3b8;">Format .xlsx ({{ \Carbon\Carbon::parse($tanggal)->translatedFormat('d M') }})</span>
+                            <span style="width:32px; height:32px; border-radius:8px; background:#dcfce7; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                                <i class="material-symbols-rounded" style="font-size:17px; color:#16a34a;">today</i>
+                            </span>
+                            <div>
+                                <div style="font-weight:600;">Export Harian</div>
+                                <div style="font-size:11px; color:#94a3b8;">{{ \Carbon\Carbon::parse($tanggal)->translatedFormat('d F Y') }}</div>
                             </div>
                         </a>
-
-                        <div style="height:1px; background:#f1f5f9; margin:0 8px;"></div>
-
+                        <div style="height:1px; background:#f1f5f9;"></div>
                         <a href="{{ route('attendance.export.monthly', ['bulan' => $bulanStr]) }}"
-                            style="display:flex; align-items:center; gap:12px; padding:12px 16px; text-decoration:none; color:#1e293b; transition:background .15s;"
+                            style="display:flex; align-items:center; gap:10px; padding:11px 14px; text-decoration:none; color:#1e293b; font-size:13px; font-weight:500; transition:background .15s;"
                             onmouseover="this.style.background='#f8fafc'"
                             onmouseout="this.style.background='#fff'">
-                            <div style="width:36px; height:36px; border-radius:8px; background:#eff6ff; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                                <i class="material-symbols-rounded" style="font-size:18px; color:#3b82f6;">calendar_add_on</i>
-                            </div>
-                            <div style="display:flex; flex-direction:column;">
-                                <span style="font-size:13px; font-weight:700; color:#334155;">Export Bulanan</span>
-                                <span style="font-size:11px; color:#94a3b8;">Format .xlsx ({{ $bulanLabel }})</span>
+                            <span style="width:32px; height:32px; border-radius:8px; background:#dbeafe; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                                <i class="material-symbols-rounded" style="font-size:17px; color:#2563eb;">calendar_month</i>
+                            </span>
+                            <div>
+                                <div style="font-weight:600;">Export Bulanan</div>
+                                <div style="font-size:11px; color:#94a3b8;">{{ $bulanLabel }}</div>
                             </div>
                         </a>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
 
-    <!--  KOLOM KANAN  -->
+    {{-- ── KOLOM KANAN ──────────────────────────────────────────────── --}}
     <div style="flex:1; min-width:0;">
 
-        <!-- VIEW HARIAN -->
+        {{-- ════ VIEW HARIAN ════ --}}
         <div id="view-daily">
             <div class="card">
                 <div class="px-4 py-3 border-b border-default-200 flex flex-wrap items-center justify-between gap-2">
@@ -150,7 +148,7 @@ return compact('k','hadir','terlambat','alpa','totalMasuk','persen');
                         </span>
                         <span class="flex items-center gap-1.5">
                             <span class="w-2.5 h-2.5 rounded-full bg-red-400 inline-block"></span>
-                            <span class="text-default-600">Alpa: <strong>{{ $totalKaryawan - $presensi->whereIn('status',['hadir','terlambat'])->count() }}</strong></span>
+                            <span class="text-default-600">Alpa: <strong>{{ $totalKaryawan - $presensi->whereIn('status',['hadir','terlambat','izin','sakit','cuti'])->count() }}</strong></span>
                         </span>
                     </div>
                     <span class="text-xs text-default-400">Total karyawan: {{ $totalKaryawan }}</span>
@@ -186,19 +184,19 @@ return compact('k','hadir','terlambat','alpa','totalMasuk','persen');
                                 <td class="px-4 py-3 text-default-600">{{ $p->jam_masuk ? \Carbon\Carbon::parse($p->jam_masuk)->format('H:i') : '-' }}</td>
                                 <td class="px-4 py-3 text-default-600">{{ $p->jam_pulang ? \Carbon\Carbon::parse($p->jam_pulang)->format('H:i') : '-' }}</td>
                                 <td class="px-4 py-3 text-center">
-                                    @if($p->status === 'hadir')
-                                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-green-500 inline-block"></span>Hadir
+                                    @php
+                                        $statusBadge = [
+                                            'hadir'     => ['bg-green-100 text-green-700',   'bg-green-500',  'Hadir'],
+                                            'terlambat' => ['bg-yellow-100 text-yellow-700', 'bg-yellow-500', 'Terlambat'],
+                                            'izin'      => ['bg-blue-100 text-blue-700',     'bg-blue-400',   'Izin'],
+                                            'sakit'     => ['bg-red-100 text-red-600',       'bg-red-400',    'Sakit'],
+                                            'cuti'      => ['bg-purple-100 text-purple-700', 'bg-purple-400', 'Cuti'],
+                                        ];
+                                        [$badgeCls, $dotCls, $badgeLabel] = $statusBadge[$p->status] ?? ['bg-gray-100 text-gray-500', 'bg-gray-400', 'Tidak Hadir'];
+                                    @endphp
+                                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold {{ $badgeCls }}">
+                                        <span class="w-1.5 h-1.5 rounded-full inline-block {{ $dotCls }}"></span>{{ $badgeLabel }}
                                     </span>
-                                    @elseif($p->status === 'terlambat')
-                                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-yellow-500 inline-block"></span>Terlambat
-                                    </span>
-                                    @else
-                                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-500">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-red-400 inline-block"></span>Tidak Hadir
-                                    </span>
-                                    @endif
                                 </td>
                                 <td class="px-4 py-3 text-center">
                                     <button type="button" onclick="showDetail(this)"
@@ -222,55 +220,55 @@ return compact('k','hadir','terlambat','alpa','totalMasuk','persen');
 
                             @foreach($karyawanAlpa as $k)
                             @php
-                            $jadwal = $k->jadwalShift->first(fn($j) =>
-                            $j->tanggal_mulai <= $tanggal && $j->tanggal_selesai >= $tanggal
+                                $jadwal = $k->jadwalShift->first(fn($j) =>
+                                    $j->tanggal_mulai <= $tanggal && $j->tanggal_selesai >= $tanggal
                                 );
-                                @endphp
-                                <tr class="hover:bg-gray-50 text-sm">
-                                    <td class="px-4 py-3 font-semibold text-default-800">{{ $k->user->name ?? '-' }}</td>
-                                    <td class="px-4 py-3 text-default-600">{{ $k->nip ?? '-' }}</td>
-                                    <td class="px-4 py-3 text-default-600">{{ $k->jabatan->nama_jabatan ?? '-' }}</td>
-                                    <td class="px-4 py-3">
-                                        @if($jadwal?->shift)
-                                        <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">{{ $jadwal->shift->nama_shift }}</span>
-                                        @else <span class="text-default-400">-</span>
-                                        @endif
-                                    </td>
-                                    <td class="px-4 py-3 text-default-400">-</td>
-                                    <td class="px-4 py-3 text-default-400">-</td>
-                                    <td class="px-4 py-3 text-center">
-                                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-500">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-red-400 inline-block"></span>Alpa
-                                        </span>
-                                    </td>
-                                    <td class="px-4 py-3 text-center">
-                                        <button type="button" onclick="showDetail(this)"
-                                            class="btn rounded-full border border-info text-info hover:bg-info hover:text-white text-xs"
-                                            data-nama="{{ $k->user->name ?? '-' }}"
-                                            data-nip="{{ $k->nip ?? '-' }}"
-                                            data-jabatan="{{ $k->jabatan->nama_jabatan ?? '-' }}"
-                                            data-shift="{{ $jadwal?->shift->nama_shift ?? '-' }}"
-                                            data-tanggal="{{ \Carbon\Carbon::parse($tanggal)->translatedFormat('d F Y') }}"
-                                            data-jam-masuk="-"
-                                            data-jam-pulang="-"
-                                            data-status="alpa"
-                                            data-latitude=""
-                                            data-longitude=""
-                                            data-jarak="">
-                                            Detail
-                                        </button>
-                                    </td>
-                                </tr>
-                                @endforeach
+                            @endphp
+                            <tr class="hover:bg-gray-50 text-sm">
+                                <td class="px-4 py-3 font-semibold text-default-800">{{ $k->user->name ?? '-' }}</td>
+                                <td class="px-4 py-3 text-default-600">{{ $k->nip ?? '-' }}</td>
+                                <td class="px-4 py-3 text-default-600">{{ $k->jabatan->nama_jabatan ?? '-' }}</td>
+                                <td class="px-4 py-3">
+                                    @if($jadwal?->shift)
+                                    <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">{{ $jadwal->shift->nama_shift }}</span>
+                                    @else <span class="text-default-400">-</span>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-3 text-default-400">-</td>
+                                <td class="px-4 py-3 text-default-400">-</td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-500">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-red-400 inline-block"></span>Alpa
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <button type="button" onclick="showDetail(this)"
+                                        class="btn rounded-full border border-info text-info hover:bg-info hover:text-white text-xs"
+                                        data-nama="{{ $k->user->name ?? '-' }}"
+                                        data-nip="{{ $k->nip ?? '-' }}"
+                                        data-jabatan="{{ $k->jabatan->nama_jabatan ?? '-' }}"
+                                        data-shift="{{ $jadwal?->shift->nama_shift ?? '-' }}"
+                                        data-tanggal="{{ \Carbon\Carbon::parse($tanggal)->translatedFormat('d F Y') }}"
+                                        data-jam-masuk="-"
+                                        data-jam-pulang="-"
+                                        data-status="alpa"
+                                        data-latitude=""
+                                        data-longitude=""
+                                        data-jarak="">
+                                        Detail
+                                    </button>
+                                </td>
+                            </tr>
+                            @endforeach
 
-                                @if($presensi->isEmpty() && empty($karyawanAlpa))
-                                <tr>
-                                    <td colspan="8" class="px-4 py-12 text-center text-default-400">
-                                        <i class="material-symbols-rounded text-4xl mb-2 block">event_busy</i>
-                                        Tidak ada data presensi pada tanggal ini.
-                                    </td>
-                                </tr>
-                                @endif
+                            @if($presensi->isEmpty() && empty($karyawanAlpa))
+                            <tr>
+                                <td colspan="8" class="px-4 py-12 text-center text-default-400">
+                                    <i class="material-symbols-rounded text-4xl mb-2 block">event_busy</i>
+                                    Tidak ada data presensi pada tanggal ini.
+                                </td>
+                            </tr>
+                            @endif
 
                         </tbody>
                     </table>
@@ -278,10 +276,10 @@ return compact('k','hadir','terlambat','alpa','totalMasuk','persen');
             </div>
         </div>
 
-        <!-- VIEW BULANAN -->
+        {{-- ════ VIEW BULANAN ════ --}}
         <div id="view-monthly" style="display:none;">
             <div class="card">
-                <!-- Header rekap -->
+                {{-- Header rekap --}}
                 <div class="px-4 py-3 border-b border-default-200 flex flex-wrap items-center justify-between gap-2">
                     <div class="flex items-center gap-3">
                         <div style="width:34px;height:34px;border-radius:8px;background:#eff6ff;display:flex;align-items:center;justify-content:center;">
@@ -330,8 +328,8 @@ return compact('k','hadir','terlambat','alpa','totalMasuk','persen');
                                 </td>
                                 <td class="px-4 py-3 text-center">
                                     @php
-                                    $pct = $r['persen'];
-                                    $pctColor = $pct >= 90 ? 'bg-green-100 text-green-700' : ($pct >= 60 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-600');
+                                        $pct = $r['persen'];
+                                        $pctColor = $pct >= 90 ? 'bg-green-100 text-green-700' : ($pct >= 70 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-600');
                                     @endphp
                                     <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold {{ $pctColor }}">
                                         {{ $pct }}%
@@ -356,7 +354,7 @@ return compact('k','hadir','terlambat','alpa','totalMasuk','persen');
 </div>
 
 
-<!--  MODAL DETAIL PRESENSI ─ -->
+{{-- ── MODAL DETAIL PRESENSI ───────────────────────────────────────────────── --}}
 <div id="modal-detail"
     style="display:none; position:fixed; inset:0; z-index:9999; align-items:center; justify-content:center; padding:16px;">
     <div onclick="closeDetail()"
@@ -416,110 +414,60 @@ return compact('k','hadir','terlambat','alpa','totalMasuk','persen');
 
 @push('scripts')
 <style>
-    .cal-day:hover {
-        background: rgba(79, 70, 229, .1);
-        color: #4f46e5;
-    }
-
-    .mrow {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 9px 14px;
-        border-bottom: 1px solid rgba(0, 0, 0, .05);
-    }
-
-    .mrow-last {
-        border-bottom: none;
-    }
-
-    .mlabel {
-        font-size: 13px;
-        font-weight: 600;
-        color: #94a3b8;
-    }
-
-    .mval {
-        font-size: 13px;
-        font-weight: 500;
-        color: #1e293b;
-        text-align: right;
-    }
-
+    .cal-day:hover { background:rgba(79,70,229,.1); color:#4f46e5; }
+    .mrow { display:flex; justify-content:space-between; align-items:center; padding:9px 14px; border-bottom:1px solid rgba(0,0,0,.05); }
+    .mrow-last { border-bottom:none; }
+    .mlabel { font-size:13px; font-weight:600; color:#94a3b8; }
+    .mval   { font-size:13px; font-weight:500; color:#1e293b; text-align:right; }
     @keyframes modalIn {
-        from {
-            opacity: 0;
-            transform: translateY(14px) scale(.98);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
+        from { opacity:0; transform:translateY(14px) scale(.98); }
+        to   { opacity:1; transform:translateY(0) scale(1); }
     }
 </style>
 
 <script>
-    //  KALENDER 
+    // ── KALENDER ──────────────────────────────────────────────────────────────
     const SELECTED_DATE = '{{ $tanggal }}';
-    const BASE_URL = '{{ route("attendance.history") }}';
-    const BULAN_ID = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
-    ];
+    const BASE_URL      = '{{ route("attendance.history") }}';
+    const BULAN_ID      = ['Januari','Februari','Maret','April','Mei','Juni',
+                           'Juli','Agustus','September','Oktober','November','Desember'];
     let curYear, curMonth;
 
     (function init() {
         const d = new Date(SELECTED_DATE + 'T00:00:00');
-        curYear = d.getFullYear();
-        curMonth = d.getMonth();
+        curYear = d.getFullYear(); curMonth = d.getMonth();
         renderCalendar();
     })();
 
     document.getElementById('btn-prev').addEventListener('click', () => {
-        curMonth--;
-        if (curMonth < 0) {
-            curMonth = 11;
-            curYear--;
-        }
-        renderCalendar();
+        curMonth--; if (curMonth < 0) { curMonth = 11; curYear--; } renderCalendar();
     });
     document.getElementById('btn-next').addEventListener('click', () => {
-        curMonth++;
-        if (curMonth > 11) {
-            curMonth = 0;
-            curYear++;
-        }
-        renderCalendar();
+        curMonth++; if (curMonth > 11) { curMonth = 0; curYear++; } renderCalendar();
     });
 
     function renderCalendar() {
         document.getElementById('cal-header').textContent = BULAN_ID[curMonth] + ' ' + curYear;
         const grid = document.getElementById('cal-grid');
         grid.innerHTML = '';
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        const today    = new Date(); today.setHours(0,0,0,0);
         const selected = new Date(SELECTED_DATE + 'T00:00:00');
         const firstDay = new Date(curYear, curMonth, 1).getDay();
-        const total = new Date(curYear, curMonth + 1, 0).getDate();
+        const total    = new Date(curYear, curMonth + 1, 0).getDate();
 
-        for (let i = 0; i < firstDay; i++) grid.insertAdjacentHTML('beforeend', '<div></div>');
+        for (let i = 0; i < firstDay; i++) grid.insertAdjacentHTML('beforeend','<div></div>');
 
         for (let d = 1; d <= total; d++) {
-            const t = new Date(curYear, curMonth, d);
-            t.setHours(0, 0, 0, 0);
+            const t   = new Date(curYear, curMonth, d); t.setHours(0,0,0,0);
             const iso = `${curYear}-${String(curMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
             const base = 'display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:12px;margin:0 auto;transition:background .15s,color .15s;';
-            let cls = '',
-                style;
+            let cls = '', style;
 
             if (t.getTime() === selected.getTime())
                 style = base + 'background:#4f46e5;color:#fff;font-weight:700;box-shadow:0 1px 4px rgba(79,70,229,.4);';
             else if (t.getTime() === today.getTime())
                 style = base + 'background:#e5e7eb;color:#1f2937;font-weight:600;';
-            else {
-                cls = 'cal-day';
-                style = base + 'color:#4b5563;';
-            }
+            else { cls = 'cal-day'; style = base + 'color:#4b5563;'; }
 
             grid.insertAdjacentHTML('beforeend',
                 `<div class="${cls}" data-date="${iso}" style="${style}">${d}</div>`);
@@ -532,12 +480,12 @@ return compact('k','hadir','terlambat','alpa','totalMasuk','persen');
         );
     }
 
-    //  TOGGLE VIEW HARIAN / BULANAN 
+    // ── TOGGLE VIEW HARIAN / BULANAN ──────────────────────────────────────────
     let currentView = 'daily';
 
     function toggleView(view) {
         if (view === 'monthly') {
-            document.getElementById('view-daily').style.display = 'none';
+            document.getElementById('view-daily').style.display   = 'none';
             document.getElementById('view-monthly').style.display = 'block';
             document.getElementById('btn-show-monthly').style.background = '#eff6ff';
             document.getElementById('btn-show-monthly').style.borderColor = '#2563eb';
@@ -545,7 +493,7 @@ return compact('k','hadir','terlambat','alpa','totalMasuk','persen');
             document.getElementById('btn-monthly-label').textContent = '← Kembali ke Harian';
             currentView = 'monthly';
         } else {
-            document.getElementById('view-daily').style.display = 'block';
+            document.getElementById('view-daily').style.display   = 'block';
             document.getElementById('view-monthly').style.display = 'none';
             document.getElementById('btn-show-monthly').style.background = '#f8fafc';
             document.getElementById('btn-show-monthly').style.borderColor = '#e2e8f0';
@@ -562,7 +510,7 @@ return compact('k','hadir','terlambat','alpa','totalMasuk','persen');
     // Hapus onclick di button karena sudah pakai addEventListener
     document.getElementById('btn-show-monthly').removeAttribute('onclick');
 
-    //  EXPORT DROPDOWN ─
+    // ── EXPORT DROPDOWN ───────────────────────────────────────────────────────
     function toggleExportDropdown() {
         const dd = document.getElementById('export-dropdown');
         dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
@@ -575,43 +523,26 @@ return compact('k','hadir','terlambat','alpa','totalMasuk','persen');
         }
     });
 
-    //  MODAL DETAIL ─
+    // ── MODAL DETAIL ─────────────────────────────────────────────────────────
     function showDetail(btn) {
         const d = btn.dataset;
         document.getElementById('modal-subtitle').textContent = d.tanggal || '';
-        document.getElementById('m-nama').textContent = d.nama || '-';
-        document.getElementById('m-nip').textContent = d.nip || '-';
+        document.getElementById('m-nama').textContent    = d.nama    || '-';
+        document.getElementById('m-nip').textContent     = d.nip     || '-';
         document.getElementById('m-jabatan').textContent = d.jabatan || '-';
-        document.getElementById('m-shift').textContent = d.shift || '-';
+        document.getElementById('m-shift').textContent   = d.shift   || '-';
         document.getElementById('m-tanggal').textContent = d.tanggal || '-';
-        document.getElementById('m-masuk').textContent = d.jamMasuk || '-';
-        document.getElementById('m-pulang').textContent = d.jamPulang || '-';
+        document.getElementById('m-masuk').textContent   = d.jamMasuk  || '-';
+        document.getElementById('m-pulang').textContent  = d.jamPulang || '-';
 
         const map = {
-            hadir: {
-                label: 'Hadir',
-                bg: '#dcfce7',
-                color: '#16a34a',
-                dot: '#22c55e'
-            },
-            terlambat: {
-                label: 'Terlambat',
-                bg: '#fef9c3',
-                color: '#b45309',
-                dot: '#eab308'
-            },
-            alpa: {
-                label: 'Alpa',
-                bg: '#fee2e2',
-                color: '#dc2626',
-                dot: '#f87171'
-            },
-            tidak_hadir: {
-                label: 'Tidak Hadir',
-                bg: '#fee2e2',
-                color: '#dc2626',
-                dot: '#f87171'
-            },
+            hadir:       { label:'Hadir',       bg:'#dcfce7', color:'#16a34a', dot:'#22c55e' },
+            terlambat:   { label:'Terlambat',   bg:'#fef9c3', color:'#b45309', dot:'#eab308' },
+            alpa:        { label:'Alpa',        bg:'#fee2e2', color:'#dc2626', dot:'#f87171' },
+            tidak_hadir: { label:'Tidak Hadir', bg:'#fee2e2', color:'#dc2626', dot:'#f87171' },
+            izin:        { label:'Izin',        bg:'#dbeafe', color:'#1d4ed8', dot:'#60a5fa' },
+            sakit:       { label:'Sakit',       bg:'#fee2e2', color:'#dc2626', dot:'#f87171' },
+            cuti:        { label:'Cuti',        bg:'#f3e8ff', color:'#7e22ce', dot:'#c084fc' },
         };
         const s = map[d.status] || map.tidak_hadir;
         document.getElementById('m-status').innerHTML =
@@ -624,8 +555,7 @@ return compact('k','hadir','terlambat','alpa','totalMasuk','persen');
             (d.jarak && d.jarak !== '') ? parseFloat(d.jarak).toFixed(0) + ' m dari kantor' : '-';
 
         const mapEl = document.getElementById('m-map');
-        const lat = d.latitude,
-            lng = d.longitude;
+        const lat = d.latitude, lng = d.longitude;
         const hasGps = lat && lng && lat !== '' && lng !== '';
 
         if (hasGps) {
@@ -656,8 +586,6 @@ return compact('k','hadir','terlambat','alpa','totalMasuk','persen');
         document.body.style.overflow = '';
     }
 
-    document.addEventListener('keydown', e => {
-        if (e.key === 'Escape') closeDetail();
-    });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDetail(); });
 </script>
 @endpush

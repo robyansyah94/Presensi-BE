@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\QrPresensiController;
 use App\Http\Controllers\Admin\ShiftController;
 use App\Http\Controllers\Admin\JadwalShiftController;
 use App\Http\Controllers\Admin\LokasiKantorController;
+use App\Http\Controllers\admin\PengajuanController;
 use App\Http\Controllers\Admin\UsersController;
 
 Route::get('/', function () {
@@ -62,6 +63,11 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     // Export attendance bulanan
     Route::get('/admin/attendance/export/monthly', [AttendanceController::class, 'exportMonthly'])
         ->name('attendance.export.monthly');
+
+    //PEngajuan
+    Route::get('/pengajuan', [PengajuanController::class, 'index'])->name('pengajuan.index');
+    Route::post('/pengajuan/{id}/approve', [PengajuanController::class, 'approve'])->name('pengajuan.approve');
+    Route::post('/pengajuan/{id}/reject', [PengajuanController::class, 'reject'])->name('pengajuan.reject');
 
 
     // -----IEU PENILAIAN-----------------------------------

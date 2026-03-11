@@ -19,7 +19,7 @@ class AssessmentController extends Controller
     public function index(Request $request)
     {
         $period      = 'bulanan';
-        $periodLabel = $this->buildPeriodLabel($period);
+        $periodLabel = $this->buildPeriodLabel();
 
         // Semua karyawan aktif
         $semuaKaryawan = Karyawan::with(['user', 'jabatan'])
@@ -65,7 +65,7 @@ class AssessmentController extends Controller
     public function create(Request $request, Karyawan $karyawan)
     {
         $period      = 'bulanan';
-        $periodLabel = $this->buildPeriodLabel($period);
+        $periodLabel = $this->buildPeriodLabel();
 
         // Cek apakah sudah pernah dinilai periode ini
         $existing = Assessment::where('evaluatee_id', $karyawan->id)
@@ -94,7 +94,7 @@ class AssessmentController extends Controller
     {
         $request->validate([
             'evaluatee_id'  => 'required|exists:karyawan,id',
-            'period'        => 'required|in:harian,mingguan,bulanan',
+            'period'        => 'required|in:bulanan',
             'period_label'  => 'required|string',
             'general_notes' => 'nullable|string|max:1000',
             'scores'        => 'required|array|min:1',
@@ -140,9 +140,6 @@ class AssessmentController extends Controller
             ->with('success', 'Penilaian berhasil disimpan.');
     }
 
-    /**
-     * Form edit penilaian yang sudah ada
-     */
     public function edit(Assessment $assessment)
     {
         $karyawan   = $assessment->evaluatee->load(['user', 'jabatan']);
@@ -156,10 +153,7 @@ class AssessmentController extends Controller
             'scores',
         ));
     }
-
-    /**
-     * Update penilaian
-     */
+    
     public function update(Request $request, Assessment $assessment)
     {
         $request->validate([
@@ -189,10 +183,7 @@ class AssessmentController extends Controller
         return redirect()->route('admin.assessment.index', ['period' => $assessment->period])
             ->with('success', 'Penilaian berhasil diperbarui.');
     }
-
-    /**
-     * Hapus penilaian
-     */
+    
     public function destroy(Assessment $assessment)
     {
         $period = $assessment->period;
@@ -202,9 +193,6 @@ class AssessmentController extends Controller
             ->with('success', 'Penilaian berhasil dihapus.');
     }
 
-    /**
-     * Halaman laporan / rapor per karyawan
-     */
     public function report(Karyawan $karyawan)
     {
         $karyawan->load(['user', 'jabatan']);
@@ -234,37 +222,11 @@ class AssessmentController extends Controller
         ));
     }
 
-    // ── Helper ──────────────────────────────────────────────────
-
     /**
-     * Buat label periode otomatis berdasarkan tipe
+     * Buat label periode bulanan otomatis
      */
-    private function buildPeriodLabel(string $period): string
+    private function buildPeriodLabel(): string
     {
-        return match ($period) {
-            'harian'   => now()->translatedFormat('d F Y'),
-            'mingguan' => 'Minggu ' . now()->weekOfMonth . ' ' . now()->translatedFormat('F Y'),
-            default    => now()->translatedFormat('F Y'),
-        };
-    }
-
-    /**
-     * Ambil karyawan aktif berikutnya yang belum dinilai
-     */
-    private function getNextUnnilaiKaryawan(int $currentId, string $period, string $periodLabel): ?Karyawan
-    {
-        $sudahDinilaiIds = Assessment::where('period', $period)
-            ->where('period_label', $periodLabel)
-            ->pluck('evaluatee_id')
-            ->toArray();
-
-        return Karyawan::with('user')
-            ->where('karyawan.status', 'aktif')
-            ->whereNotIn('karyawan.id', $sudahDinilaiIds)
-            ->where('karyawan.id', '!=', $currentId)
-            ->join('users', 'users.id', '=', 'karyawan.users_id')
-            ->orderByRaw('LOWER(users.name) ASC')
-            ->select('karyawan.*')
-            ->first();
+        return now()->translatedFormat('F Y'); // contoh: "March 2026"
     }
 }

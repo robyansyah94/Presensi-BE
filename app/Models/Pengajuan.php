@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Pengajuan extends Model
 {
     protected $table = 'pengajuan';
-    
+
     protected $fillable = [
         'karyawan_id',
         'jenis',
@@ -19,6 +19,11 @@ class Pengajuan extends Model
         'disetujui_oleh'
     ];
 
+    protected $casts = [
+        'tanggal_mulai'   => 'date',
+        'tanggal_selesai' => 'date',
+    ];
+
     public function karyawan()
     {
         return $this->belongsTo(Karyawan::class);
@@ -27,5 +32,10 @@ class Pengajuan extends Model
     public function disetujuiOleh()
     {
         return $this->belongsTo(User::class, 'disetujui_oleh');
+    }
+
+    public function getBuktiUrlAttribute(): ?string
+    {
+        return $this->bukti ? asset('storage/' . $this->bukti) : null;
     }
 }
