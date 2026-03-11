@@ -4,104 +4,90 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Assessment;
-use App\Models\AssessmentCategory;
-use App\Models\AssessmentDetail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AssessmentApiController extends Controller
 {
-    // Ambil riwayat semua penilaian milik karyawan yang login
-    // GET /api/assessment/riwayat
+    /**
+     * Riwayat penilaian milik karyawan yang login
+     */
     public function riwayat(Request $request)
     {
-        $karyawan = $request->user()->karyawan;
+        $user     = Auth::user();
+        $karyawan = $user->karyawan;
 
         if (!$karyawan) {
-            return response()->json(['message' => 'Data karyawan tidak ditemukan.'], 404);
+            return response()->json(['data' => []]);
         }
 
-        $assessments = Assessment::with(['details.category', 'evaluator'])
+        $query = Assessment::with(['details.category', 'evaluator'])
             ->where('evaluatee_id', $karyawan->id)
-            ->orderByDesc('assessment_date')
-            ->get()
-            ->map(function ($a) {
-                return [
-                    'id'              => $a->id,
-                    'assessment_date' => $a->assessment_date->format('d M Y'),
-                    'period'          => $a->period,
-                    'period_label'    => $a->period_label,
-                    'general_notes'   => $a->general_notes,
-                    'average_score'   => $a->average_score,
-                    'evaluator_name'  => $a->evaluator->name,
-                    'details'         => $a->details->map(fn($d) => [
-                        'category' => $d->category->name,
-                        'score'    => $d->score,
-                    ]),
-                ];
-            });
+            ->orderByDesc('assessment_date');
 
-        return response()->json([
-            'data' => $assessments,
-        ]);
-    }
-
-    // Data radar chart — rata-rata per kategori (semua waktu)
-    //  GET /api/assessment/radar
-    public function radar(Request $request)
-    {
-        $karyawan = $request->user()->karyawan;
-
-        if (!$karyawan) {
-            return response()->json(['message' => 'Data karyawan tidak ditemukan.'], 404);
+        if ($request->filled('period')) {
+            $query->where('period', $request->period);
         }
 
-        $categories = AssessmentCategory::active()->orderBy('name')->get();
-
-        $radarData = $categories->map(function ($cat) use ($karyawan) {
-            $avg = AssessmentDetail::whereHas('assessment', fn($q) => $q->where('evaluatee_id', $karyawan->id))
-                ->where('category_id', $cat->id)
-                ->avg('score');
-
+        $assessments = $query->get()->map(function ($a) {
             return [
-                'category' => $cat->name,
-                'average'  => round($avg ?? 0, 1),
+                'id'              => $a->id,
+                'period'          => $a->period,
+                'period_label'    => $a->period_label,
+                'assessment_date' => $a->assessment_date,
+                'average_score'   => $a->average_score,
+                'general_notes'   => $a->general_notes,
+                'evaluator'       => optional($a->evaluator)->name,
+                'details'         => $a->details->map(fn($d) => [
+                    'id'       => $d->id,
+                    'score'    => $d->score,
+                    'category' => $d->category ? ['name' => $d->category->name] : null,
+                ]),
             ];
         });
 
-        return response()->json([
-            'data' => $radarData,
-        ]);
+        return response()->json(['data' => $assessments]);
     }
 
-    
-    // Detail satu penilaian
-    // GET /api/assessment/{id}
-    public function show(Request $request, Assessment $assessment)
+    /**
+     * Data radar chart — rata-rata per kategori
+     */
+    public function radar(Request $request)
     {
-        $karyawan = $request->user()->karyawan;
+        $user     = Auth::user();
+        $karyawan = $user->karyawan;
 
-        // Pastikan karyawan hanya bisa lihat penilaian miliknya sendiri
-        if (!$karyawan || $assessment->evaluatee_id !== $karyawan->id) {
-            return response()->json(['message' => 'Tidak diizinkan.'], 403);
+        if (!$karyawan) {
+            return response()->json(['data' => []]);
         }
 
-        $assessment->load(['details.category', 'evaluator']);
+        $query = Assessment::with('details.category')
+            ->where('evaluatee_id', $karyawan->id);
 
-        return response()->json([
-            'data' => [
-                'id'              => $assessment->id,
-                'assessment_date' => $assessment->assessment_date->format('d M Y'),
-                'period'          => $assessment->period,
-                'period_label'    => $assessment->period_label,
-                'general_notes'   => $assessment->general_notes,
-                'average_score'   => $assessment->average_score,
-                'evaluator_name'  => $assessment->evaluator->name,
-                'details'         => $assessment->details->map(fn($d) => [
-                    'category'    => $d->category->name,
-                    'description' => $d->category->description,
-                    'score'       => $d->score,
-                ]),
-            ],
-        ]);
+        if ($request->filled('period')) {
+            $query->where('period', $request->period);
+        }
+
+        $assessments = $query->get();
+
+        // Kumpulkan semua score per kategori
+        $categoryScores = [];
+        foreach ($assessments as $assessment) {
+            foreach ($assessment->details as $detail) {
+                if (!$detail->category) continue;
+                $name = $detail->category->name;
+                $categoryScores[$name][] = $detail->score;
+            }
+        }
+
+        // Hitung rata-rata per kategori
+        $radarData = collect($categoryScores)->map(function ($scores, $category) {
+            return [
+                'category' => $category,
+                'average'  => round(array_sum($scores) / count($scores), 1),
+            ];
+        })->values();
+
+        return response()->json(['data' => $radarData]);
     }
 }

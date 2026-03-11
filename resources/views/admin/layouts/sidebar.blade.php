@@ -122,14 +122,26 @@
                     </a>
                 </li>
 
-                <li class="px-3 py-2 text-xs uppercase font-medium text-default-500">MANAGEMENT</li>
+                <!-- assesmen -->
+                <li class="px-3 py-2 text-xs uppercase font-medium text-default-500">PENILAIAN</li>
+                <li>
+                    <a href="{{ route('admin.assessment.index') }}"
+                        class="flex items-center gap-x-2 rounded-md px-3 py-2 text-sm font-medium transition-all
+                                        {{ request()->routeIs('admin.assessment.index') || request()->routeIs('admin.assessment.create') || request()->routeIs('admin.assessment.edit') || request()->routeIs('admin.assessment.report')
+                                            ? 'text-primary bg-primary/5'
+                                            : 'text-default-600 hover:bg-primary/5' }}">
+                        <i class="material-symbols-rounded" style="font-size: 18px;">grading</i>
+                        Input Penilaian
+                    </a>
+                </li>
 
-                <li class="menu-item">
-                    <a class="group flex items-center gap-x-3.5 rounded-md px-3 py-2 text-sm font-medium text-default-600 transition-all hover:bg-primary/5"
-                        href="{{ route('admin.assessment.categories.index') }}">
-                        <i class="material-symbols-rounded" style="font-size: 21px;">
-                            rate_review
-                        </i>
+                <li>
+                    <a href="{{ route('admin.assessment.categories.index') }}"
+                        class="flex items-center gap-x-2 rounded-md px-3 py-2 text-sm font-medium transition-all
+                                        {{ request()->routeIs('admin.assessment.categories.*')
+                                            ? 'text-primary bg-primary/5'
+                                            : 'text-default-600 hover:bg-primary/5' }}">
+                        <i class="material-symbols-rounded" style="font-size: 18px;">category</i>
                         Kategori
                     </a>
                 </li>

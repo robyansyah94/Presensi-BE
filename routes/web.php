@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AssessmentCategoryController;
+use App\Http\Controllers\Admin\AssessmentController;
 use App\Http\Controllers\Admin\AttendanceController;
 use App\Http\Controllers\Admin\JabatanController;
 use Illuminate\Support\Facades\Route;
@@ -74,5 +75,14 @@ Route::prefix('admin')->middleware('auth')->group(function () {
         //route custom untuk toggle aktif/nonaktif
         Route::patch('categories/{category}/toggle', [AssessmentCategoryController::class, 'toggleActive'])
             ->name('categories.toggle');
+
+        // Input Penilaian
+        Route::get('/', [AssessmentController::class, 'index'])->name('index');
+        Route::get('/create/{karyawan}', [AssessmentController::class, 'create'])->name('create');
+        Route::post('/store', [AssessmentController::class, 'store'])->name('store');
+        Route::get('/{assessment}/edit', [AssessmentController::class, 'edit'])->name('edit');
+        Route::put('/{assessment}', [AssessmentController::class, 'update'])->name('update');
+        Route::delete('/{assessment}', [AssessmentController::class, 'destroy'])->name('destroy');
+        Route::get('/report/{karyawan}', [AssessmentController::class, 'report'])->name('report');
     });
 });

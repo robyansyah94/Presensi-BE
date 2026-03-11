@@ -5,6 +5,8 @@ use App\Http\Controllers\Api\RiwayatPresensiController;
 use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Api\AssessmentApiController;
+
 
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -28,5 +30,10 @@ Route::middleware('auth:sanctum')->group(function () {
             'foto'              => optional($user->karyawan)->foto,
             'jabatan'           => optional(optional($user->karyawan)->jabatan)->nama_jabatan,
         ]);
+    });
+
+    Route::prefix('assessment')->group(function () {
+        Route::get('/riwayat', [AssessmentApiController::class, 'riwayat']);
+        Route::get('/radar',   [AssessmentApiController::class, 'radar']);
     });
 });
