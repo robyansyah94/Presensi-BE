@@ -2,16 +2,22 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\PresensiRecorded;
 use App\Http\Controllers\Controller;
 use App\Models\JadwalShift;
 use App\Models\Karyawan;
 use App\Models\LokasiKantor;
 use App\Models\Presensi;
 use App\Models\QrPresensi;
+use App\Services\TokenInterceptorService;
 use Illuminate\Http\Request;
 
 class PresensiController extends Controller
 {
+    public function __construct(
+        private readonly TokenInterceptorService $tokenInterceptor
+    ) {}
+
     public function scan(Request $request)
     {
         // ── VALIDASI INPUT ────────────────────────────────────────────────────
@@ -91,74 +97,94 @@ class PresensiController extends Controller
         // ── STEP F: Logika CHECK-IN ───────────────────────────────────────────
         if (!$presensi) {
 
-            // Waktu jam masuk shift (hari ini)
-            $jamMasukShift = now()->setTimeFromTimeString($shift->jam_masuk);
-
-            // Batas paling awal boleh check-in: 60 menit sebelum jam masuk
+            $jamMasukShift    = now()->setTimeFromTimeString($shift->jam_masuk);
             $batasAwalCheckin = $jamMasukShift->copy()->subMinutes(60);
+            $batasAkhirCheckin = $jamMasukShift->copy()->addMinutes(600);
+            $sekarang          = now();
 
-            // Batas paling akhir boleh check-in: 60 menit setelah jam masuk
-            // (toleransi_telat hanya untuk menentukan status, bukan batas check-in)
-            $batasAkhirCheckin = $jamMasukShift->copy()->addMinutes(60);
-
-            $sekarang = now();
-
-            // Terlalu awal
             if ($sekarang->lt($batasAwalCheckin)) {
-                $mulaiStr = $batasAwalCheckin->format('H:i');
                 return response()->json([
-                    'message' => "Presensi masuk belum bisa dilakukan. Anda bisa check-in mulai jam {$mulaiStr} (60 menit sebelum shift).",
+                    'message' => "Presensi masuk belum bisa dilakukan. Anda bisa check-in mulai jam {$batasAwalCheckin->format('H:i')} (60 menit sebelum shift).",
                 ], 403);
             }
 
-            // Terlalu telat (lebih dari 60 menit setelah jam masuk)
             if ($sekarang->gt($batasAkhirCheckin)) {
-                $batasStr    = $batasAkhirCheckin->format('H:i');
-                $jamMasukStr = $jamMasukShift->format('H:i');
                 return response()->json([
-                    'message' => "Waktu check-in sudah berakhir. Batas check-in untuk shift ini adalah jam {$batasStr} (60 menit setelah jam masuk {$jamMasukStr}).",
+                    'message' => "Waktu check-in sudah berakhir. Batas check-in untuk shift ini adalah jam {$batasAkhirCheckin->format('H:i')}.",
                 ], 403);
             }
 
-            // Tentukan status: hadir atau terlambat
+            // ── Hitung status & menit terlambat ──────────────────────────────
             $batasTerlambat = $jamMasukShift->copy()->addMinutes($shift->toleransi_telat);
-            $status         = $sekarang->gt($batasTerlambat) ? 'terlambat' : 'hadir';
+            $isTerlambat    = $sekarang->gt($batasTerlambat);
+            $statusAwal     = $isTerlambat ? 'terlambat' : 'hadir';
 
-            Presensi::create([
+            // Hitung menit terlambat dari jam mulai shift (bukan dari batas toleransi)
+            $menitTerlambat = $isTerlambat
+                ? (int) $jamMasukShift->diffInMinutes($sekarang)
+                : 0;
+
+            // ── TOKEN INTERCEPTOR ─────────────────────────────────────────────
+            // Cek apakah user punya token kelonggaran yang bisa menutup keterlambatan ini
+            $intercept   = $this->tokenInterceptor->intercept($karyawan, $statusAwal, $menitTerlambat);
+            $finalStatus = $intercept['status'];
+            $tokenUsed   = $intercept['token_used'];
+
+            // ── Simpan Presensi ───────────────────────────────────────────────
+            $presensiRecord = Presensi::create([
                 'karyawan_id'       => $karyawan->id,
                 'shift_id'          => $shift->id,
                 'tanggal'           => $today,
-                'jam_masuk'         => now()->toTimeString(),
-                'status'            => $status,
+                'jam_masuk'         => $sekarang->toTimeString(),
+                'status'            => $finalStatus,
                 'latitude'          => $request->latitude,
                 'longitude'         => $request->longitude,
                 'jarak_dari_kantor' => $jarak,
                 'qr_token'          => $qr->qr_token,
             ]);
 
-            $label = $status === 'terlambat' ? '⚠️ Terlambat' : '✅ Tepat Waktu';
+            // ── Tandai Token sebagai USED (setelah presensi tersimpan) ────────
+            if ($tokenUsed) {
+                $tokenUsed->update([
+                    'status'                => 'USED',
+                    'used_at_attendance_id' => $presensiRecord->id,
+                ]);
+            }
 
-            return response()->json([
+            // ── Fire Event → Rule Engine → Ledger ────────────────────────────
+            // Load relasi shift agar RuleEngineService tidak N+1
+            $presensiRecord->load('shift');
+            event(new PresensiRecorded($presensiRecord, $karyawan));
+
+            // ── Response ──────────────────────────────────────────────────────
+            $label = match ($finalStatus) {
+                'hadir'       => '✅ Tepat Waktu',
+                'terlambat'   => '⚠️ Terlambat',
+                'hadir_token' => '🎫 Token Digunakan',
+                default       => $finalStatus,
+            };
+
+            $extra = $tokenUsed
+                ? ['token_used' => $tokenUsed->item->item_name]
+                : [];
+
+            return response()->json(array_merge([
                 'message' => "Presensi Masuk Berhasil! ({$label})",
-                'status'  => $status,
+                'status'  => $finalStatus,
                 'jarak'   => $jarak,
-            ]);
+            ], $extra));
         }
 
         // ── STEP G: Logika CHECK-OUT ──────────────────────────────────────────
         if (!$presensi->jam_pulang) {
 
-            // Batas paling awal boleh check-out: 30 menit sebelum jam pulang shift
             $jamPulangShift    = now()->setTimeFromTimeString($shift->jam_pulang);
             $batasAwalCheckout = $jamPulangShift->copy()->subMinutes(30);
-
-            $sekarang = now();
+            $sekarang          = now();
 
             if ($sekarang->lt($batasAwalCheckout)) {
-                $mulaiStr    = $batasAwalCheckout->format('H:i');
-                $jamPulangStr = $jamPulangShift->format('H:i');
                 return response()->json([
-                    'message' => "Presensi pulang belum bisa dilakukan. Anda bisa check-out mulai jam {$mulaiStr} (30 menit sebelum jam pulang {$jamPulangStr}).",
+                    'message' => "Presensi pulang belum bisa dilakukan. Anda bisa check-out mulai jam {$batasAwalCheckout->format('H:i')} (30 menit sebelum jam pulang {$jamPulangShift->format('H:i')}).",
                 ], 403);
             }
 

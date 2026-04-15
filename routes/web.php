@@ -3,6 +3,8 @@
 use App\Http\Controllers\Admin\AssessmentCategoryController;
 use App\Http\Controllers\Admin\AssessmentController;
 use App\Http\Controllers\Admin\AttendanceController;
+use App\Http\Controllers\Admin\FlexibilityItemController;
+use App\Http\Controllers\Admin\IntegrityAnalyticsController;
 use App\Http\Controllers\Admin\JabatanController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AdminAuthController;
@@ -11,6 +13,7 @@ use App\Http\Controllers\Admin\ShiftController;
 use App\Http\Controllers\Admin\JadwalShiftController;
 use App\Http\Controllers\Admin\LokasiKantorController;
 use App\Http\Controllers\admin\PengajuanController;
+use App\Http\Controllers\Admin\PointRuleController;
 use App\Http\Controllers\Admin\UsersController;
 
 Route::get('/', function () {
@@ -90,5 +93,22 @@ Route::prefix('admin')->middleware('auth')->group(function () {
         Route::put('/{assessment}', [AssessmentController::class, 'update'])->name('update');
         Route::delete('/{assessment}', [AssessmentController::class, 'destroy'])->name('destroy');
         Route::get('/report/{karyawan}', [AssessmentController::class, 'report'])->name('report');
+    });
+
+    Route::prefix('integrity')->name('admin.integrity.')->middleware('auth')->group(function () {
+        // --- Point Rules ---
+        Route::resource('rules', PointRuleController::class)
+            ->except(['show']);
+        Route::patch('rules/{rule}/toggle', [PointRuleController::class, 'toggle'])
+            ->name('rules.toggle');
+
+        // --- Marketplace Items ---
+        Route::resource('marketplace', FlexibilityItemController::class)
+            ->except(['show'])
+            ->parameters(['marketplace' => 'item']);
+
+        // --- Analytics / Leaderboard ---
+        Route::get('analytics', [IntegrityAnalyticsController::class, 'index'])
+            ->name('analytics.index');
     });
 });

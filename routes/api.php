@@ -17,7 +17,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/presensi/riwayat', [RiwayatPresensiController::class, 'index']);
 
     Route::get('/pengajuan', [PengajuanApiController::class, 'index']);
-    
+
     Route::post('/pengajuan', [PengajuanApiController::class, 'store']);
 
     Route::get('/me', function (Request $request) {
@@ -40,4 +40,19 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/riwayat', [AssessmentApiController::class, 'riwayat']);
         Route::get('/radar',   [AssessmentApiController::class, 'radar']);
     });
+
+    // --- Integrity Wallet (User) ---
+    Route::prefix('wallet')->group(function () {
+        Route::get('/',        [App\Http\Controllers\Api\IntegrityWalletController::class, 'index']);
+        Route::get('/history', [App\Http\Controllers\Api\IntegrityWalletController::class, 'history']);
+    });
+
+    // --- Marketplace (User) ---
+    Route::prefix('marketplace')->group(function () {
+        Route::get('/',                [App\Http\Controllers\Api\MarketplaceController::class, 'index']);
+        Route::post('/{item}/redeem',  [App\Http\Controllers\Api\MarketplaceController::class, 'redeem']);
+    });
+
+    // --- Token Inventory (User) ---
+    Route::get('/tokens', [App\Http\Controllers\Api\UserTokenController::class, 'index']);
 });

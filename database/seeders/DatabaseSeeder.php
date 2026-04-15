@@ -2,16 +2,19 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
     public function run(): void
     {
-        $this->call(AdminSeeder::class);
+        $this->call([
+            // Seeder lama kamu (jika ada, tetap di sini)
+            // UserSeeder::class,
+
+            // ── Fitur Gamifikasi ──────────────────────────
+            PointRulesSeeder::class,
+            FlexibilityItemsSeeder::class,
+        ]);
     }
 }
