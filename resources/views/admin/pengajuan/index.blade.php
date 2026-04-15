@@ -73,9 +73,9 @@
                     <td class="px-4 py-3">
                         @php
                             $jenisMap = [
-                                'izin'  => ['bg-blue-100 text-blue-700',   '📋'],
-                                'sakit' => ['bg-red-100 text-red-600',     '🤒'],
-                                'cuti'  => ['bg-purple-100 text-purple-700','🌴'],
+                                'izin'  => ['text-blue-700',   '📋'],
+                                'sakit' => ['text-red-600',     '🤒'],
+                                'cuti'  => ['text-purple-700','🌴'],
                             ];
                             [$cls, $emoji] = $jenisMap[$p->jenis] ?? ['bg-gray-100 text-gray-600','📄'];
                         @endphp
@@ -123,7 +123,7 @@
                         </span>
                         @else
                         <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-500">
-                            <span class="w-1.5 h-1.5 rounded-full bg-red-400 inline-block"></span>Ditolak
+                            <span class="w-1.5 h-1.5 rounded-full bg-red-500 inline-block"></span>Ditolak
                         </span>
                         @endif
                     </td>

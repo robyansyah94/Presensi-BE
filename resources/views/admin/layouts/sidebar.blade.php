@@ -100,28 +100,6 @@
                     </a>
                 </li>
 
-                <li class="px-3 py-2 text-xs uppercase font-medium text-default-500">Settings</li>
-
-                <li class="menu-item">
-                    <a class="group flex items-center gap-x-3.5 rounded-md px-3 py-2 text-sm font-medium text-default-600 transition-all hover:bg-primary/5"
-                        href="{{ route('jadwal-shift.index') }}">
-                        <i class="material-symbols-rounded" style="font-size: 21px;">
-                            calendar_add_on
-                        </i>
-                        Atur Schedule
-                    </a>
-                </li>
-
-                <li class="menu-item">
-                    <a class="group flex items-center gap-x-3.5 rounded-md px-3 py-2 text-sm font-medium text-default-600 transition-all hover:bg-primary/5"
-                        href="{{ route('lokasi-kantor.index') }}">
-                        <i class="material-symbols-rounded" style="font-size: 21px;">
-                            location_on
-                        </i>
-                        Lokasi Kantor
-                    </a>
-                </li>
-
                 <!-- assesmen -->
                 <li class="px-3 py-2 text-xs uppercase font-medium text-default-500">PENILAIAN</li>
                 <li>
@@ -142,7 +120,29 @@
                                             ? 'text-primary bg-primary/5'
                                             : 'text-default-600 hover:bg-primary/5' }}">
                         <i class="material-symbols-rounded" style="font-size: 18px;">category</i>
-                        Kategori
+                        Kategori Penilaian
+                    </a>
+                </li>
+
+                <li class="px-3 py-2 text-xs uppercase font-medium text-default-500">Settings</li>
+
+                <li class="menu-item">
+                    <a class="group flex items-center gap-x-3.5 rounded-md px-3 py-2 text-sm font-medium text-default-600 transition-all hover:bg-primary/5"
+                        href="{{ route('jadwal-shift.index') }}">
+                        <i class="material-symbols-rounded" style="font-size: 21px;">
+                            calendar_add_on
+                        </i>
+                        Atur Schedule
+                    </a>
+                </li>
+
+                <li class="menu-item">
+                    <a class="group flex items-center gap-x-3.5 rounded-md px-3 py-2 text-sm font-medium text-default-600 transition-all hover:bg-primary/5"
+                        href="{{ route('lokasi-kantor.index') }}">
+                        <i class="material-symbols-rounded" style="font-size: 21px;">
+                            location_on
+                        </i>
+                        Lokasi Kantor
                     </a>
                 </li>
         </div>

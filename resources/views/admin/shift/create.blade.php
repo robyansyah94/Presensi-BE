@@ -87,10 +87,9 @@
                     Simpan
                 </button>
 
-                <a href="{{ route('shift.index') }}"
-                    class="px-6 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition">
-                    Batal
-                </a>
+            <a href="{{ route('shift.index') }}" class="btn border ml-2">
+                Batal
+            </a>
             </div>
 
         </form>
