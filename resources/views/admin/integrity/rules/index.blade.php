@@ -21,17 +21,27 @@
         </a>
     </div>
 
-    {{-- Flash message --}}
     @if(session('success'))
     <div class="mb-4 p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg flex items-center gap-2">
         <span>✅</span> {{ session('success') }}
     </div>
     @endif
 
-    {{-- Penjelasan singkat --}}
-    <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-700">
-        <strong>Cara kerja:</strong> Setiap kali karyawan berhasil check-in, sistem secara otomatis mengevaluasi
-        semua rule aktif di bawah ini dan menambah/mengurangi poin sesuai kondisi yang cocok.
+    {{-- Panduan Jenis Kondisi --}}
+    <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-700">
+            <strong>⏰ Menit Lebih Awal dari Shift</strong><br>
+            Dihitung relatif terhadap jam masuk shift masing-masing karyawan. 
+            Contoh: "BETWEEN 10 DAN 60" artinya datang 10–60 menit sebelum shift → dapat poin.
+        </div>
+        <div class="p-3 bg-purple-50 border border-purple-200 rounded-lg text-xs text-purple-700">
+            <strong>🏷️ Status Presensi</strong><br>
+            Cocokkan berdasarkan status. Nilai kondisi diisi: 
+            <code class="bg-purple-100 px-1 rounded">hadir</code>,
+            <code class="bg-purple-100 px-1 rounded">terlambat</code>,
+            <code class="bg-purple-100 px-1 rounded">alpa</code>, atau
+            <code class="bg-purple-100 px-1 rounded">hadir_token</code>.
+        </div>
     </div>
 
     {{-- Tabel Rules --}}
@@ -52,23 +62,24 @@
                 <tr class="hover:bg-gray-50 transition {{ $rule->is_active ? '' : 'opacity-50' }}">
                     <td class="px-4 py-3 font-medium text-gray-800">{{ $rule->rule_name }}</td>
 
-                    {{-- Kondisi dalam format statement builder --}}
+                    {{-- Kondisi --}}
                     <td class="px-4 py-3">
                         <span class="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
-                            JIKA
-                            <span class="text-indigo-600">
-                                {{ $rule->condition_type === 'jam_masuk' ? 'Jam Kedatangan' : 'Menit Terlambat' }}
-                            </span>
-                            <span class="text-orange-500 font-bold">{{ $rule->condition_operator }}</span>
-                            <span class="text-green-700">{{ $rule->condition_value }}</span>
-                            @if($rule->condition_operator === 'BETWEEN')
-                            <span class="text-gray-500">DAN</span>
-                            <span class="text-green-700">{{ $rule->condition_value_max }}</span>
+                            @if($rule->condition_type === 'status_presensi')
+                                JIKA <span class="text-purple-600">Status</span>
+                                = <span class="text-green-700 font-bold">{{ $rule->condition_value }}</span>
+                            @else
+                                JIKA <span class="text-indigo-600">{{ $rule->condition_type_label }}</span>
+                                <span class="text-orange-500 font-bold">{{ $rule->condition_operator }}</span>
+                                <span class="text-green-700">{{ $rule->condition_value }}</span>
+                                @if($rule->condition_operator === 'BETWEEN')
+                                    <span class="text-gray-500">DAN</span>
+                                    <span class="text-green-700">{{ $rule->condition_value_max }}</span>
+                                @endif
                             @endif
                         </span>
                     </td>
 
-                    {{-- Poin modifier --}}
                     <td class="px-4 py-3 text-center">
                         @if($rule->point_modifier > 0)
                             <span class="inline-block bg-green-100 text-green-700 font-bold px-3 py-1 rounded-full text-xs">
@@ -83,7 +94,6 @@
 
                     <td class="px-4 py-3 text-center text-gray-500 capitalize">{{ $rule->target_role }}</td>
 
-                    {{-- Toggle Status --}}
                     <td class="px-4 py-3 text-center">
                         <form action="{{ route('admin.integrity.rules.toggle', $rule) }}" method="POST">
                             @csrf @method('PATCH')
@@ -97,7 +107,6 @@
                         </form>
                     </td>
 
-                    {{-- Aksi --}}
                     <td class="px-4 py-3 text-center">
                         <div class="flex items-center justify-center gap-2">
                             <a href="{{ route('admin.integrity.rules.edit', $rule) }}"
@@ -114,13 +123,12 @@
                 <tr>
                     <td colspan="6" class="px-4 py-12 text-center text-gray-400">
                         <div class="text-4xl mb-2">⚙️</div>
-                        <div>Belum ada rule. Tambahkan rule pertama Anda!</div>
+                        <div>Belum ada rule.</div>
                     </td>
                 </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
-
 </div>
 @endsection

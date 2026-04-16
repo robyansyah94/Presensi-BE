@@ -9,17 +9,22 @@ use App\Models\Karyawan;
 use App\Models\LokasiKantor;
 use App\Models\Presensi;
 use App\Models\QrPresensi;
+use App\Services\AlpaPointService;
 use App\Services\TokenInterceptorService;
 use Illuminate\Http\Request;
 
 class PresensiController extends Controller
 {
     public function __construct(
-        private readonly TokenInterceptorService $tokenInterceptor
+        private readonly TokenInterceptorService $tokenInterceptor,
+        private readonly AlpaPointService $alpaPointService
     ) {}
 
     public function scan(Request $request)
     {
+        // Panggil di awal method scan (ketika ada karyawan scan, maka sistem akan cek semua jadwal hari ini, jika ada yang jam_pulang-nya sudah lewat tapi belum ada record presensi, maka akan otomatis diinsert sebagai alpa)
+        $this->checkAndInsertAlpa();
+
         // ── VALIDASI INPUT ────────────────────────────────────────────────────
         $request->validate([
             'qr_token'  => 'required|string',
@@ -99,7 +104,7 @@ class PresensiController extends Controller
 
             $jamMasukShift    = now()->setTimeFromTimeString($shift->jam_masuk);
             $batasAwalCheckin = $jamMasukShift->copy()->subMinutes(60);
-            $batasAkhirCheckin = $jamMasukShift->copy()->addMinutes(600);
+            $batasAkhirCheckin = $jamMasukShift->copy()->addMinutes(60);
             $sekarang          = now();
 
             if ($sekarang->lt($batasAwalCheckin)) {
@@ -205,6 +210,48 @@ class PresensiController extends Controller
         return response()->json([
             'message' => 'Anda sudah melakukan presensi masuk dan pulang hari ini.',
         ], 400);
+    }
+
+    private function checkAndInsertAlpa(): void
+    {
+        $today   = now()->toDateString();
+        $sekarang = now();
+
+        // Ambil semua jadwal shift yang jam_pulang-nya sudah lewat hari ini
+        $jadwalHariIni = JadwalShift::where('tanggal_mulai', '<=', $today)
+            ->where('tanggal_selesai', '>=', $today)
+            ->with('shift')
+            ->get();
+
+        foreach ($jadwalHariIni as $jadwal) {
+            $jamPulangShift = $sekarang->copy()->setTimeFromTimeString($jadwal->shift->jam_pulang);
+
+            // Skip jika jam pulang shift belum lewat
+            if ($sekarang->lt($jamPulangShift)) continue;
+
+            // Skip jika sudah ada record presensi
+            $sudahAbsen = Presensi::where('karyawan_id', $jadwal->karyawan_id)
+                ->where('tanggal', $today)
+                ->exists();
+
+            if ($sudahAbsen) continue;
+
+            // Insert alpa
+            $presensiAlpa = Presensi::create([
+                'karyawan_id'       => $jadwal->karyawan_id,
+                'shift_id'          => $jadwal->shift_id,
+                'tanggal'           => $today,
+                'jam_masuk'         => null,
+                'jam_pulang'        => null,
+                'status'            => 'alpa',
+                'latitude'          => null,
+                'longitude'         => null,
+                'jarak_dari_kantor' => null,
+                'qr_token'          => null,
+            ]);
+
+            $this->alpaPointService->process($presensiAlpa);
+        }
     }
 
     // ── Haversine formula ─────────────────────────────────────────────────────

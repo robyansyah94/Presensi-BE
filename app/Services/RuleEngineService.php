@@ -15,17 +15,12 @@ class RuleEngineService
     ) {}
 
     /**
-     * Evaluasi semua rule aktif untuk satu presensi check-in.
-     * Dipanggil oleh Listener setelah event PresensiRecorded.
+     * Entry point utama — dipanggil dari:
+     * 1. Listener ProcessIntegrityPoints (setelah check-in berhasil)
+     * 2. Langsung dari controller/service saat sistem mencatat ALPA
      */
     public function evaluate(Presensi $presensi, Karyawan $karyawan): void
     {
-        // Guard: hanya proses check-in (jam_pulang belum ada)
-        if (!$presensi->jam_masuk || $presensi->jam_pulang) return;
-
-        // Guard: token sudah menangani, skip Rule Engine untuk poin
-        if ($presensi->status === 'hadir_token') return;
-
         // Guard: jangan double-proses rule yang sama untuk 1 presensi
         $alreadyProcessed = PointLedger::where('reference_type', 'presensi')
             ->where('reference_id', $presensi->id)
@@ -33,46 +28,47 @@ class RuleEngineService
 
         if ($alreadyProcessed) return;
 
-        // ── Load relasi yang dibutuhkan (hindari null / lazy load gagal) ──────
-        // Pastikan shift ter-load (untuk jam_masuk shift)
+        // Load relasi yang dibutuhkan
         if (!$presensi->relationLoaded('shift')) {
             $presensi->load('shift');
         }
-
-        // Pastikan relasi user ter-load untuk ambil role
         if (!$karyawan->relationLoaded('user')) {
             $karyawan->load('user');
         }
 
-        // Guard: shift tidak ada (seharusnya tidak terjadi, tapi aman)
         if (!$presensi->shift) {
             \Log::warning("RuleEngine: shift null untuk presensi #{$presensi->id}");
             return;
         }
 
-        // ── Hitung parameter kondisi ──────────────────────────────────────────
-        $jamMasuk      = Carbon::createFromTimeString($presensi->jam_masuk);
+        // ── Hitung semua parameter kondisi ───────────────────────────────────
         $jamMasukShift = Carbon::createFromTimeString($presensi->shift->jam_masuk);
+        $status        = $presensi->status; // hadir / terlambat / alpa / hadir_token
 
-        // Menit terlambat: 0 jika datang tepat/lebih awal
-        $menitTerlambat = $jamMasuk->gt($jamMasukShift)
+        // Untuk alpa: jam_masuk null, set parameter ke nilai "tidak hadir"
+        $jamMasuk       = $presensi->jam_masuk
+            ? Carbon::createFromTimeString($presensi->jam_masuk)
+            : null;
+
+        // Menit terlambat (dari jam mulai shift)
+        $menitTerlambat = ($jamMasuk && $jamMasuk->gt($jamMasukShift))
             ? (int) $jamMasukShift->diffInMinutes($jamMasuk)
             : 0;
 
-        // ── Ambil role karyawan (fallback ke 'karyawan' jika relasi null) ─────
-        $role = optional($karyawan->user)->role ?? 'karyawan';
+        // Menit lebih awal (datang sebelum jam shift)
+        $menitLebihAwal = ($jamMasuk && $jamMasuk->lt($jamMasukShift))
+            ? (int) $jamMasuk->diffInMinutes($jamMasukShift)
+            : 0;
 
-        // ── Ambil semua rule aktif untuk role ini ─────────────────────────────
+        // ── Ambil role & rules ────────────────────────────────────────────────
+        $role  = optional($karyawan->user)->role ?? 'karyawan';
         $rules = PointRule::active()->forRole($role)->get();
 
-        if ($rules->isEmpty()) {
-            \Log::info("RuleEngine: tidak ada rule aktif untuk role '{$role}'");
-            return;
-        }
+        if ($rules->isEmpty()) return;
 
         // ── Evaluasi setiap rule ──────────────────────────────────────────────
         foreach ($rules as $rule) {
-            if (!$this->matches($rule, $jamMasuk, $menitTerlambat)) {
+            if (!$this->matches($rule, $jamMasuk, $menitTerlambat, $menitLebihAwal, $status)) {
                 continue;
             }
 
@@ -90,18 +86,25 @@ class RuleEngineService
                 refId: $presensi->id,
             );
 
-            \Log::info("RuleEngine: rule '{$rule->rule_name}' cocok → {$type} {$absAmount} poin untuk user #{$karyawan->users_id}. Ledger ID: " . ($result?->id ?? 'GAGAL'));
+            \Log::info("RuleEngine: '{$rule->rule_name}' → {$type} {$absAmount} poin | user #{$karyawan->users_id} | ledger: " . ($result?->id ?? 'GAGAL'));
         }
     }
 
-    // ── Evaluator per Rule ────────────────────────────────────────────────────
+    // ── Dispatcher kondisi ────────────────────────────────────────────────────
 
-    private function matches(PointRule $rule, Carbon $jamMasuk, int $menitTerlambat): bool
-    {
+    private function matches(
+        PointRule $rule,
+        ?Carbon $jamMasuk,
+        int $menitTerlambat,
+        int $menitLebihAwal,
+        string $status
+    ): bool {
         return match ($rule->condition_type) {
-            'jam_masuk'       => $this->matchTime($rule, $jamMasuk),
-            'menit_terlambat' => $this->matchMinutes($rule, $menitTerlambat),
-            default           => false,
+            'jam_masuk'        => $jamMasuk ? $this->matchTime($rule, $jamMasuk) : false,
+            'menit_terlambat'  => $this->matchMinutes($rule, $menitTerlambat),
+            'menit_lebih_awal' => $this->matchMinutes($rule, $menitLebihAwal),
+            'status_presensi'  => $this->matchStatus($rule, $status),
+            default            => false,
         };
     }
 
@@ -120,16 +123,25 @@ class RuleEngineService
         };
     }
 
-    private function matchMinutes(PointRule $rule, int $menitTerlambat): bool
+    private function matchMinutes(PointRule $rule, int $menit): bool
     {
         $val = (int) $rule->condition_value;
 
         return match ($rule->condition_operator) {
-            '<'       => $menitTerlambat > 0 && $menitTerlambat < $val,
-            '>'       => $menitTerlambat > $val,
-            'BETWEEN' => $menitTerlambat >= $val
-                && $menitTerlambat <= (int) $rule->condition_value_max,
+            '<'       => $menit > 0 && $menit < $val,
+            '>'       => $menit > $val,
+            'BETWEEN' => $menit >= $val && $menit <= (int) $rule->condition_value_max,
             default   => false,
         };
+    }
+
+    /**
+     * Cocokkan berdasarkan status presensi.
+     * condition_value diisi dengan status: hadir / terlambat / alpa / hadir_token
+     * condition_operator diabaikan (selalu exact match).
+     */
+    private function matchStatus(PointRule $rule, string $status): bool
+    {
+        return strtolower($rule->condition_value) === strtolower($status);
     }
 }

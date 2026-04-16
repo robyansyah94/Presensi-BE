@@ -53,12 +53,31 @@ class PointRule extends Model
         return ($this->point_modifier > 0 ? '+' : '') . $this->point_modifier . ' Poin';
     }
 
+    /**
+     * Label human-readable untuk condition_type.
+     */
+    public function getConditionTypeLabelAttribute(): string
+    {
+        return match ($this->condition_type) {
+            'jam_masuk'        => 'Jam Kedatangan',
+            'menit_terlambat'  => 'Menit Terlambat',
+            'menit_lebih_awal' => 'Menit Lebih Awal dari Shift',
+            'status_presensi'  => 'Status Presensi',
+            default            => $this->condition_type,
+        };
+    }
+
     public function getConditionLabelAttribute(): string
     {
-        $type = $this->condition_type === 'jam_masuk' ? 'Jam Kedatangan' : 'Menit Terlambat';
+        $type = $this->condition_type_label;
         $op   = $this->condition_operator;
         $val  = $this->condition_value;
         $max  = $this->condition_value_max;
+
+        // Status presensi: tidak pakai operator, langsung exact match
+        if ($this->condition_type === 'status_presensi') {
+            return "Status = {$val}";
+        }
 
         if ($op === 'BETWEEN') {
             return "{$type} ANTARA {$val} DAN {$max}";

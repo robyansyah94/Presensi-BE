@@ -22,14 +22,14 @@ class PointRuleController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'rule_name'          => 'required|string|max:100',
-            'target_role'        => 'required|in:karyawan,admin,all',
-            'condition_type'     => 'required|in:jam_masuk,menit_terlambat',
-            'condition_operator' => 'required|in:<,>,BETWEEN',
-            'condition_value'    => 'required|string|max:20',
-            'condition_value_max'=> 'nullable|string|max:20|required_if:condition_operator,BETWEEN',
-            'point_modifier'     => 'required|integer|not_in:0',
-            'is_active'          => 'boolean',
+            'rule_name'           => 'required|string|max:100',
+            'target_role'         => 'required|in:karyawan,admin,all',
+            'condition_type'      => 'required|in:jam_masuk,menit_terlambat,menit_lebih_awal,status_presensi',
+            'condition_operator'  => 'nullable|in:<,>,BETWEEN|required_unless:condition_type,status_presensi',
+            'condition_value'     => 'required|string|max:20',
+            'condition_value_max' => 'nullable|string|max:20|required_if:condition_operator,BETWEEN',
+            'point_modifier'      => 'required|integer|not_in:0',
+            'is_active'           => 'boolean',
         ]);
 
         $data['is_active'] = $request->boolean('is_active', true);
@@ -48,14 +48,14 @@ class PointRuleController extends Controller
     public function update(Request $request, PointRule $rule)
     {
         $data = $request->validate([
-            'rule_name'          => 'required|string|max:100',
-            'target_role'        => 'required|in:karyawan,admin,all',
-            'condition_type'     => 'required|in:jam_masuk,menit_terlambat',
-            'condition_operator' => 'required|in:<,>,BETWEEN',
-            'condition_value'    => 'required|string|max:20',
-            'condition_value_max'=> 'nullable|string|max:20|required_if:condition_operator,BETWEEN',
-            'point_modifier'     => 'required|integer|not_in:0',
-            'is_active'          => 'boolean',
+            'rule_name'           => 'required|string|max:100',
+            'target_role'         => 'required|in:karyawan,admin,all',
+            'condition_type'      => 'required|in:jam_masuk,menit_terlambat,menit_lebih_awal,status_presensi',
+            'condition_operator'  => 'nullable|in:<,>,BETWEEN|required_unless:condition_type,status_presensi',
+            'condition_value'     => 'required|string|max:20',
+            'condition_value_max' => 'nullable|string|max:20|required_if:condition_operator,BETWEEN',
+            'point_modifier'      => 'required|integer|not_in:0',
+            'is_active'           => 'boolean',
         ]);
 
         $data['is_active'] = $request->boolean('is_active');
