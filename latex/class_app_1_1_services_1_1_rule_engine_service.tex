@@ -1,0 +1,75 @@
+\doxysection{App\textbackslash{}Services\textbackslash{}Rule\+Engine\+Service Class Reference}
+\hypertarget{class_app_1_1_services_1_1_rule_engine_service}{}\label{class_app_1_1_services_1_1_rule_engine_service}\index{App\textbackslash{}Services\textbackslash{}RuleEngineService@{App\textbackslash{}Services\textbackslash{}RuleEngineService}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{class_app_1_1_services_1_1_rule_engine_service_af0a328b84dc58855ebb1e06dffa6692e}{\+\_\+\+\_\+construct}} (private readonly \doxymbox{\hyperlink{class_app_1_1_services_1_1_point_ledger_service}{Point\+Ledger\+Service}} \$ledger)
+\item 
+\doxymbox{\hyperlink{class_app_1_1_services_1_1_rule_engine_service_a61213fa175b6d6710586bc25e080bff1}{evaluate}} (\doxymbox{\hyperlink{class_app_1_1_models_1_1_presensi}{Presensi}} \$presensi, \doxymbox{\hyperlink{class_app_1_1_models_1_1_karyawan}{Karyawan}} \$karyawan)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{class_app_1_1_services_1_1_rule_engine_service_a10d72712fc651161d7c7622aedcc7fac}{matches}} (\doxymbox{\hyperlink{class_app_1_1_models_1_1_point_rule}{Point\+Rule}} \$rule, ?Carbon \$jam\+Masuk, int \$menit\+Terlambat, int \$menit\+Lebih\+Awal, string \$status)
+\item 
+\doxymbox{\hyperlink{class_app_1_1_services_1_1_rule_engine_service_a67b1e404a0624490bb7e232a1ba60bfe}{match\+Time}} (\doxymbox{\hyperlink{class_app_1_1_models_1_1_point_rule}{Point\+Rule}} \$rule, Carbon \$jam\+Masuk)
+\item 
+\doxymbox{\hyperlink{class_app_1_1_services_1_1_rule_engine_service_a6dcf88655869bf0e9e9ebc9909007477}{match\+Minutes}} (\doxymbox{\hyperlink{class_app_1_1_models_1_1_point_rule}{Point\+Rule}} \$rule, int \$menit)
+\item 
+\doxymbox{\hyperlink{class_app_1_1_services_1_1_rule_engine_service_ad8b26cb6b29d9526ee36b4697561b465}{match\+Status}} (\doxymbox{\hyperlink{class_app_1_1_models_1_1_point_rule}{Point\+Rule}} \$rule, string \$status)
+\end{DoxyCompactItemize}
+
+
+\label{doc-constructors}
+\Hypertarget{class_app_1_1_services_1_1_rule_engine_service_doc-constructors}
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_app_1_1_services_1_1_rule_engine_service_af0a328b84dc58855ebb1e06dffa6692e}\index{App\textbackslash{}Services\textbackslash{}RuleEngineService@{App\textbackslash{}Services\textbackslash{}RuleEngineService}!\_\_construct@{\_\_construct}}
+\index{\_\_construct@{\_\_construct}!App\textbackslash{}Services\textbackslash{}RuleEngineService@{App\textbackslash{}Services\textbackslash{}RuleEngineService}}
+\doxysubsubsection{\texorpdfstring{\_\_construct()}{\_\_construct()}}
+{\footnotesize\ttfamily \label{class_app_1_1_services_1_1_rule_engine_service_af0a328b84dc58855ebb1e06dffa6692e} 
+App\textbackslash{}\+Services\textbackslash{}\+Rule\+Engine\+Service::\+\+\_\+\+\_\+construct (\begin{DoxyParamCaption}\item[{private readonly \doxymbox{\hyperlink{class_app_1_1_services_1_1_point_ledger_service}{Point\+Ledger\+Service}}}]{\$ledger}{}\end{DoxyParamCaption})}
+
+
+
+\label{doc-func-members}
+\Hypertarget{class_app_1_1_services_1_1_rule_engine_service_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_app_1_1_services_1_1_rule_engine_service_a61213fa175b6d6710586bc25e080bff1}\index{App\textbackslash{}Services\textbackslash{}RuleEngineService@{App\textbackslash{}Services\textbackslash{}RuleEngineService}!evaluate@{evaluate}}
+\index{evaluate@{evaluate}!App\textbackslash{}Services\textbackslash{}RuleEngineService@{App\textbackslash{}Services\textbackslash{}RuleEngineService}}
+\doxysubsubsection{\texorpdfstring{evaluate()}{evaluate()}}
+{\footnotesize\ttfamily \label{class_app_1_1_services_1_1_rule_engine_service_a61213fa175b6d6710586bc25e080bff1} 
+App\textbackslash{}\+Services\textbackslash{}\+Rule\+Engine\+Service::\+evaluate (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{class_app_1_1_models_1_1_presensi}{Presensi}}}]{\$presensi}{, }\item[{\doxymbox{\hyperlink{class_app_1_1_models_1_1_karyawan}{Karyawan}}}]{\$karyawan}{}\end{DoxyParamCaption})}
+
+Entry point utama — dipanggil dari:\+
+\begin{DoxyEnumerate}
+\item Listener Process\+Integrity\+Points (setelah check-\/in berhasil)
+\item Langsung dari controller/\+service saat sistem mencatat ALPA 
+\end{DoxyEnumerate}\Hypertarget{class_app_1_1_services_1_1_rule_engine_service_a10d72712fc651161d7c7622aedcc7fac}\index{App\textbackslash{}Services\textbackslash{}RuleEngineService@{App\textbackslash{}Services\textbackslash{}RuleEngineService}!matches@{matches}}
+\index{matches@{matches}!App\textbackslash{}Services\textbackslash{}RuleEngineService@{App\textbackslash{}Services\textbackslash{}RuleEngineService}}
+\doxysubsubsection{\texorpdfstring{matches()}{matches()}}
+{\footnotesize\ttfamily \label{class_app_1_1_services_1_1_rule_engine_service_a10d72712fc651161d7c7622aedcc7fac} 
+App\textbackslash{}\+Services\textbackslash{}\+Rule\+Engine\+Service::\+matches (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{class_app_1_1_models_1_1_point_rule}{Point\+Rule}}}]{\$rule}{, }\item[{?Carbon}]{\$jam\+Masuk}{, }\item[{int}]{\$menit\+Terlambat}{, }\item[{int}]{\$menit\+Lebih\+Awal}{, }\item[{string}]{\$status}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{class_app_1_1_services_1_1_rule_engine_service_a6dcf88655869bf0e9e9ebc9909007477}\index{App\textbackslash{}Services\textbackslash{}RuleEngineService@{App\textbackslash{}Services\textbackslash{}RuleEngineService}!matchMinutes@{matchMinutes}}
+\index{matchMinutes@{matchMinutes}!App\textbackslash{}Services\textbackslash{}RuleEngineService@{App\textbackslash{}Services\textbackslash{}RuleEngineService}}
+\doxysubsubsection{\texorpdfstring{matchMinutes()}{matchMinutes()}}
+{\footnotesize\ttfamily \label{class_app_1_1_services_1_1_rule_engine_service_a6dcf88655869bf0e9e9ebc9909007477} 
+App\textbackslash{}\+Services\textbackslash{}\+Rule\+Engine\+Service::\+match\+Minutes (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{class_app_1_1_models_1_1_point_rule}{Point\+Rule}}}]{\$rule}{, }\item[{int}]{\$menit}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{class_app_1_1_services_1_1_rule_engine_service_ad8b26cb6b29d9526ee36b4697561b465}\index{App\textbackslash{}Services\textbackslash{}RuleEngineService@{App\textbackslash{}Services\textbackslash{}RuleEngineService}!matchStatus@{matchStatus}}
+\index{matchStatus@{matchStatus}!App\textbackslash{}Services\textbackslash{}RuleEngineService@{App\textbackslash{}Services\textbackslash{}RuleEngineService}}
+\doxysubsubsection{\texorpdfstring{matchStatus()}{matchStatus()}}
+{\footnotesize\ttfamily \label{class_app_1_1_services_1_1_rule_engine_service_ad8b26cb6b29d9526ee36b4697561b465} 
+App\textbackslash{}\+Services\textbackslash{}\+Rule\+Engine\+Service::\+match\+Status (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{class_app_1_1_models_1_1_point_rule}{Point\+Rule}}}]{\$rule}{, }\item[{string}]{\$status}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+Cocokkan berdasarkan status presensi. condition\+\_\+value diisi dengan status:\+ hadir /\+ terlambat /\+ alpa /\+ hadir\+\_\+token condition\+\_\+operator diabaikan (selalu exact match). \Hypertarget{class_app_1_1_services_1_1_rule_engine_service_a67b1e404a0624490bb7e232a1ba60bfe}\index{App\textbackslash{}Services\textbackslash{}RuleEngineService@{App\textbackslash{}Services\textbackslash{}RuleEngineService}!matchTime@{matchTime}}
+\index{matchTime@{matchTime}!App\textbackslash{}Services\textbackslash{}RuleEngineService@{App\textbackslash{}Services\textbackslash{}RuleEngineService}}
+\doxysubsubsection{\texorpdfstring{matchTime()}{matchTime()}}
+{\footnotesize\ttfamily \label{class_app_1_1_services_1_1_rule_engine_service_a67b1e404a0624490bb7e232a1ba60bfe} 
+App\textbackslash{}\+Services\textbackslash{}\+Rule\+Engine\+Service::\+match\+Time (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{class_app_1_1_models_1_1_point_rule}{Point\+Rule}}}]{\$rule}{, }\item[{Carbon}]{\$jam\+Masuk}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+The documentation for this class was generated from the following file:\+\begin{DoxyCompactItemize}
+\item 
+app/\+\+Services/\+\doxymbox{\hyperlink{_rule_engine_service_8php}{Rule\+Engine\+Service.\+php}}\end{DoxyCompactItemize}

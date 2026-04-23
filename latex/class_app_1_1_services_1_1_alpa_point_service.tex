@@ -1,0 +1,43 @@
+\doxysection{App\textbackslash{}Services\textbackslash{}Alpa\+Point\+Service Class Reference}
+\hypertarget{class_app_1_1_services_1_1_alpa_point_service}{}\label{class_app_1_1_services_1_1_alpa_point_service}\index{App\textbackslash{}Services\textbackslash{}AlpaPointService@{App\textbackslash{}Services\textbackslash{}AlpaPointService}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{class_app_1_1_services_1_1_alpa_point_service_a48b53daf31802a47b4925e61993c4bae}{\+\_\+\+\_\+construct}} (private readonly \doxymbox{\hyperlink{class_app_1_1_services_1_1_rule_engine_service}{Rule\+Engine\+Service}} \$engine)
+\item 
+\doxymbox{\hyperlink{class_app_1_1_services_1_1_alpa_point_service_a0b6debe01df1f5edf967bdb948967ab3}{process}} (\doxymbox{\hyperlink{class_app_1_1_models_1_1_presensi}{Presensi}} \$presensi)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Service ini dipanggil dari controller/\+command yang mencatat status alpa. Tugasnya:\+ pastikan Rule Engine dijalankan untuk presensi yang berstatus alpa.
+
+CARA PAKAI — di controller/\+command yang menyimpan alpa:\+
+
+/\+/\+ Setelah Presensi::\+create(\+[\textquotesingle{}status\textquotesingle{} =\texorpdfstring{$>$}{>} \textquotesingle{}alpa\textquotesingle{}, ...]\+) atau update:\+ app(\+Alpa\+Point\+Service::\+class)-\/\texorpdfstring{$>$}{>}process(\$presensi); 
+
+\label{doc-constructors}
+\Hypertarget{class_app_1_1_services_1_1_alpa_point_service_doc-constructors}
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_app_1_1_services_1_1_alpa_point_service_a48b53daf31802a47b4925e61993c4bae}\index{App\textbackslash{}Services\textbackslash{}AlpaPointService@{App\textbackslash{}Services\textbackslash{}AlpaPointService}!\_\_construct@{\_\_construct}}
+\index{\_\_construct@{\_\_construct}!App\textbackslash{}Services\textbackslash{}AlpaPointService@{App\textbackslash{}Services\textbackslash{}AlpaPointService}}
+\doxysubsubsection{\texorpdfstring{\_\_construct()}{\_\_construct()}}
+{\footnotesize\ttfamily \label{class_app_1_1_services_1_1_alpa_point_service_a48b53daf31802a47b4925e61993c4bae} 
+App\textbackslash{}\+Services\textbackslash{}\+Alpa\+Point\+Service::\+\+\_\+\+\_\+construct (\begin{DoxyParamCaption}\item[{private readonly \doxymbox{\hyperlink{class_app_1_1_services_1_1_rule_engine_service}{Rule\+Engine\+Service}}}]{\$engine}{}\end{DoxyParamCaption})}
+
+
+
+\label{doc-func-members}
+\Hypertarget{class_app_1_1_services_1_1_alpa_point_service_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_app_1_1_services_1_1_alpa_point_service_a0b6debe01df1f5edf967bdb948967ab3}\index{App\textbackslash{}Services\textbackslash{}AlpaPointService@{App\textbackslash{}Services\textbackslash{}AlpaPointService}!process@{process}}
+\index{process@{process}!App\textbackslash{}Services\textbackslash{}AlpaPointService@{App\textbackslash{}Services\textbackslash{}AlpaPointService}}
+\doxysubsubsection{\texorpdfstring{process()}{process()}}
+{\footnotesize\ttfamily \label{class_app_1_1_services_1_1_alpa_point_service_a0b6debe01df1f5edf967bdb948967ab3} 
+App\textbackslash{}\+Services\textbackslash{}\+Alpa\+Point\+Service::\+process (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{class_app_1_1_models_1_1_presensi}{Presensi}}}]{\$presensi}{}\end{DoxyParamCaption})}
+
+
+
+The documentation for this class was generated from the following file:\+\begin{DoxyCompactItemize}
+\item 
+app/\+\+Services/\+\doxymbox{\hyperlink{_alpa_point_service_8php}{Alpa\+Point\+Service.\+php}}\end{DoxyCompactItemize}

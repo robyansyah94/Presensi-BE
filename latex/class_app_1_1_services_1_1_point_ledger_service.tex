@@ -1,0 +1,59 @@
+\doxysection{App\textbackslash{}Services\textbackslash{}Point\+Ledger\+Service Class Reference}
+\hypertarget{class_app_1_1_services_1_1_point_ledger_service}{}\label{class_app_1_1_services_1_1_point_ledger_service}\index{App\textbackslash{}Services\textbackslash{}PointLedgerService@{App\textbackslash{}Services\textbackslash{}PointLedgerService}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{class_app_1_1_services_1_1_point_ledger_service_aa2ba12068cae91153138bfcdc0fb431d}{record}} (int \$user\+Id, string \$type, int \$amount, string \$description, ?string \$ref\+Type=null, ?int \$ref\+Id=null)
+\item 
+\doxymbox{\hyperlink{class_app_1_1_services_1_1_point_ledger_service_a229232d999913c3a56239563f751b109}{get\+Balance}} (int \$user\+Id)
+\item 
+\doxymbox{\hyperlink{class_app_1_1_services_1_1_point_ledger_service_ae20d87494304bdfb005ece31ba9aac66}{get\+History}} (int \$user\+Id, int \$per\+Page=20)
+\end{DoxyCompactItemize}
+
+
+\label{doc-func-members}
+\Hypertarget{class_app_1_1_services_1_1_point_ledger_service_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_app_1_1_services_1_1_point_ledger_service_a229232d999913c3a56239563f751b109}\index{App\textbackslash{}Services\textbackslash{}PointLedgerService@{App\textbackslash{}Services\textbackslash{}PointLedgerService}!getBalance@{getBalance}}
+\index{getBalance@{getBalance}!App\textbackslash{}Services\textbackslash{}PointLedgerService@{App\textbackslash{}Services\textbackslash{}PointLedgerService}}
+\doxysubsubsection{\texorpdfstring{getBalance()}{getBalance()}}
+{\footnotesize\ttfamily \label{class_app_1_1_services_1_1_point_ledger_service_a229232d999913c3a56239563f751b109} 
+App\textbackslash{}\+Services\textbackslash{}\+Point\+Ledger\+Service::\+get\+Balance (\begin{DoxyParamCaption}\item[{int}]{\$user\+Id}{}\end{DoxyParamCaption})}
+
+Ambil saldo poin user saat ini. \Hypertarget{class_app_1_1_services_1_1_point_ledger_service_ae20d87494304bdfb005ece31ba9aac66}\index{App\textbackslash{}Services\textbackslash{}PointLedgerService@{App\textbackslash{}Services\textbackslash{}PointLedgerService}!getHistory@{getHistory}}
+\index{getHistory@{getHistory}!App\textbackslash{}Services\textbackslash{}PointLedgerService@{App\textbackslash{}Services\textbackslash{}PointLedgerService}}
+\doxysubsubsection{\texorpdfstring{getHistory()}{getHistory()}}
+{\footnotesize\ttfamily \label{class_app_1_1_services_1_1_point_ledger_service_ae20d87494304bdfb005ece31ba9aac66} 
+App\textbackslash{}\+Services\textbackslash{}\+Point\+Ledger\+Service::\+get\+History (\begin{DoxyParamCaption}\item[{int}]{\$user\+Id}{, }\item[{int}]{\$per\+Page}{ = {\ttfamily 20}}\end{DoxyParamCaption})}
+
+Ambil riwayat mutasi dengan pagination. \Hypertarget{class_app_1_1_services_1_1_point_ledger_service_aa2ba12068cae91153138bfcdc0fb431d}\index{App\textbackslash{}Services\textbackslash{}PointLedgerService@{App\textbackslash{}Services\textbackslash{}PointLedgerService}!record@{record}}
+\index{record@{record}!App\textbackslash{}Services\textbackslash{}PointLedgerService@{App\textbackslash{}Services\textbackslash{}PointLedgerService}}
+\doxysubsubsection{\texorpdfstring{record()}{record()}}
+{\footnotesize\ttfamily \label{class_app_1_1_services_1_1_point_ledger_service_aa2ba12068cae91153138bfcdc0fb431d} 
+App\textbackslash{}\+Services\textbackslash{}\+Point\+Ledger\+Service::\+record (\begin{DoxyParamCaption}\item[{int}]{\$user\+Id}{, }\item[{string}]{\$type}{, }\item[{int}]{\$amount}{, }\item[{string}]{\$description}{, }\item[{?string}]{\$ref\+Type}{ = {\ttfamily null}, }\item[{?int}]{\$ref\+Id}{ = {\ttfamily null}}\end{DoxyParamCaption})}
+
+Catat transaksi poin ke buku besar. Menggunakan DB transaction + lock\+For\+Update untuk mencegah race condition.
+
+
+\begin{DoxyParams}[1]{Parameters}
+int & {\em \$user\+Id} & \\
+\hline
+string & {\em \$type} & EARN \texorpdfstring{$\vert$}{|} SPEND \texorpdfstring{$\vert$}{|} PENALTY \\
+\hline
+int & {\em \$amount} & Selalu positif \\
+\hline
+string & {\em \$description} & \\
+\hline
+string | null & {\em \$ref\+Type} & \\
+\hline
+int | null & {\em \$ref\+Id} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Point\+Ledger\texorpdfstring{$\vert$}{|}null null hanya jika SPEND tapi saldo tidak cukup 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following file:\+\begin{DoxyCompactItemize}
+\item 
+app/\+\+Services/\+\doxymbox{\hyperlink{_point_ledger_service_8php}{Point\+Ledger\+Service.\+php}}\end{DoxyCompactItemize}

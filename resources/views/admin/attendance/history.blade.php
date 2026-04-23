@@ -191,8 +191,9 @@
                                             'izin'      => ['bg-blue-100 text-blue-700',     'bg-blue-400',   'Izin'],
                                             'sakit'     => ['bg-red-100 text-red-600',       'bg-red-400',    'Sakit'],
                                             'cuti'      => ['bg-purple-100 text-purple-700', 'bg-purple-400', 'Cuti'],
+                                            'alpa'      => ['bg-red-100 text-red-600',       'bg-red-400',    'Alpa'],
                                         ];
-                                        [$badgeCls, $dotCls, $badgeLabel] = $statusBadge[$p->status] ?? ['bg-gray-100 text-gray-500', 'bg-gray-400', 'Tidak Hadir'];
+                                        [$badgeCls, $dotCls, $badgeLabel] = $statusBadge[$p->status] ?? ['bg-gray-100 text-gray-500', 'bg-gray-400', ucfirst($p->status ?? 'unknown')];
                                     @endphp
                                     <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold {{ $badgeCls }}">
                                         <span class="w-1.5 h-1.5 rounded-full inline-block {{ $dotCls }}"></span>{{ $badgeLabel }}
@@ -208,7 +209,7 @@
                                         data-tanggal="{{ \Carbon\Carbon::parse($p->tanggal)->translatedFormat('d F Y') }}"
                                         data-jam-masuk="{{ $p->jam_masuk ? \Carbon\Carbon::parse($p->jam_masuk)->format('H:i') : '-' }}"
                                         data-jam-pulang="{{ $p->jam_pulang ? \Carbon\Carbon::parse($p->jam_pulang)->format('H:i') : '-' }}"
-                                        data-status="{{ $p->status ?? 'tidak_hadir' }}"
+                                        data-status="{{ $p->status }}"
                                         data-latitude="{{ $p->latitude ?? '' }}"
                                         data-longitude="{{ $p->longitude ?? '' }}"
                                         data-jarak="{{ $p->jarak_dari_kantor ?? '' }}">
@@ -539,12 +540,16 @@
             hadir:       { label:'Hadir',       bg:'#dcfce7', color:'#16a34a', dot:'#22c55e' },
             terlambat:   { label:'Terlambat',   bg:'#fef9c3', color:'#b45309', dot:'#eab308' },
             alpa:        { label:'Alpa',        bg:'#fee2e2', color:'#dc2626', dot:'#f87171' },
-            tidak_hadir: { label:'Tidak Hadir', bg:'#fee2e2', color:'#dc2626', dot:'#f87171' },
             izin:        { label:'Izin',        bg:'#dbeafe', color:'#1d4ed8', dot:'#60a5fa' },
             sakit:       { label:'Sakit',       bg:'#fee2e2', color:'#dc2626', dot:'#f87171' },
             cuti:        { label:'Cuti',        bg:'#f3e8ff', color:'#7e22ce', dot:'#c084fc' },
         };
-        const s = map[d.status] || map.tidak_hadir;
+        const s = map[d.status] || {
+    label: d.status ?? 'Unknown',
+    bg: '#f1f5f9',
+    color: '#64748b',
+    dot: '#94a3b8'
+};
         document.getElementById('m-status').innerHTML =
             `<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 12px;border-radius:999px;font-size:12px;font-weight:600;background:${s.bg};color:${s.color};">
                 <span style="width:7px;height:7px;border-radius:50%;background:${s.dot};display:inline-block;flex-shrink:0;"></span>

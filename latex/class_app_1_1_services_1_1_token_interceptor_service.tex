@@ -1,0 +1,28 @@
+\doxysection{App\textbackslash{}Services\textbackslash{}Token\+Interceptor\+Service Class Reference}
+\hypertarget{class_app_1_1_services_1_1_token_interceptor_service}{}\label{class_app_1_1_services_1_1_token_interceptor_service}\index{App\textbackslash{}Services\textbackslash{}TokenInterceptorService@{App\textbackslash{}Services\textbackslash{}TokenInterceptorService}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{class_app_1_1_services_1_1_token_interceptor_service_addbbd6ccef8d03d79e064e50bd4dbab6}{intercept}} (\doxymbox{\hyperlink{class_app_1_1_models_1_1_karyawan}{Karyawan}} \$karyawan, string \$status, int \$menit\+Terlambat)
+\end{DoxyCompactItemize}
+
+
+\label{doc-func-members}
+\Hypertarget{class_app_1_1_services_1_1_token_interceptor_service_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_app_1_1_services_1_1_token_interceptor_service_addbbd6ccef8d03d79e064e50bd4dbab6}\index{App\textbackslash{}Services\textbackslash{}TokenInterceptorService@{App\textbackslash{}Services\textbackslash{}TokenInterceptorService}!intercept@{intercept}}
+\index{intercept@{intercept}!App\textbackslash{}Services\textbackslash{}TokenInterceptorService@{App\textbackslash{}Services\textbackslash{}TokenInterceptorService}}
+\doxysubsubsection{\texorpdfstring{intercept()}{intercept()}}
+{\footnotesize\ttfamily \label{class_app_1_1_services_1_1_token_interceptor_service_addbbd6ccef8d03d79e064e50bd4dbab6} 
+App\textbackslash{}\+Services\textbackslash{}\+Token\+Interceptor\+Service::\+intercept (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{class_app_1_1_models_1_1_karyawan}{Karyawan}}}]{\$karyawan}{, }\item[{string}]{\$status}{, }\item[{int}]{\$menit\+Terlambat}{}\end{DoxyParamCaption})}
+
+Cek apakah user punya token yang bisa mengintervensi status presensi. Dipanggil SEBELUM Presensi::\+create() di Presensi\+Controller.
+
+\begin{DoxyReturn}{Returns}
+array\{status:\+ string, token\+\_\+used:\+ User\+Token\texorpdfstring{$\vert$}{|}null\} 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following file:\+\begin{DoxyCompactItemize}
+\item 
+app/\+\+Services/\+\doxymbox{\hyperlink{_token_interceptor_service_8php}{Token\+Interceptor\+Service.\+php}}\end{DoxyCompactItemize}

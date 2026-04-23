@@ -6,6 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Services\PointLedgerService;
 use Illuminate\Http\Request;
 
+/**
+ * IntegrityWalletController
+ * Controller untuk mengelola "dompet" poin disiplin pengguna.
+ */
 class IntegrityWalletController extends Controller
 {
     public function __construct(
@@ -66,7 +70,7 @@ class IntegrityWalletController extends Controller
             $balance >= 100 => ['name' => 'Disiplin 🔵',          'color' => '#4F8EF7', 'min' => 100, 'next' => 200],
             $balance >= 50  => ['name' => 'Cukup Disiplin 🟢',    'color' => '#4CAF50', 'min' => 50,  'next' => 100],
             $balance >= 0   => ['name' => 'Pemula 🟡',            'color' => '#FFC107', 'min' => 0,   'next' => 50],
-            default         => ['name' => 'Perlu Perbaikan 🔴',   'color' => '#F44336', 'min' => null,'next' => 0],
+            default         => ['name' => 'Perlu Perbaikan 🔴',   'color' => '#F44336', 'min' => null, 'next' => 0],
         };
     }
 }

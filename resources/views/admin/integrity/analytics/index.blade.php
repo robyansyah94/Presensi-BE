@@ -52,6 +52,7 @@
             <p class="text-2xl font-bold text-purple-700">{{ $tokenUsed }}</p>
         </div>
     </div>
+    <br>
 
     {{-- Leaderboard --}}
     <div class="bg-white rounded-xl shadow overflow-hidden">
